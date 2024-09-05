@@ -5,4 +5,6 @@ import com.crypto.user.dto.UserResponse;
 
 public interface UserService {
     UserResponse createUser(CreateUserRequest request);
+
+    UserResponse getUser(String id);
 }
