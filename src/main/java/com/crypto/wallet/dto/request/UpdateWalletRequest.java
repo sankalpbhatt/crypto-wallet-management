@@ -14,6 +14,9 @@ public class UpdateWalletRequest {
 
     private BigDecimal balance;
 
+    public UpdateWalletRequest() {
+    }
+
     public UpdateWalletRequest(Operation operation, BigDecimal balance) {
         this.operation = operation;
         this.balance = balance;

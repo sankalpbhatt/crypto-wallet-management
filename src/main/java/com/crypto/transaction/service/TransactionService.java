@@ -7,4 +7,5 @@ public interface TransactionService {
 
     TransactionResponse createTransaction(CreateTransactionRequest createTransactionRequest);
 
+    TransactionResponse getTransactionById(String id);
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import org.hibernate.annotations.Generated;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -17,10 +18,11 @@ public class Transaction {
     private UUID id;
     private String transactionId;
     private UUID walletId;
-    private double amount;
+    private BigDecimal amount;
     private TransactionType transactionType;
     private TransactionStatus status;
-    private OffsetDateTime timestamp;
+    private LocalDateTime timestamp;
+    private String externalReferenceId;
     private LocalDateTime createdDate = LocalDateTime.now();
     private LocalDateTime updatedDate;
     private LocalDateTime deletedDate;
@@ -49,11 +51,11 @@ public class Transaction {
         this.walletId = walletId;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -73,11 +75,11 @@ public class Transaction {
         this.status = status;
     }
 
-    public OffsetDateTime getTimestamp() {
+    public LocalDateTime getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(OffsetDateTime timestamp) {
+    public void setTimestamp(LocalDateTime timestamp) {
         this.timestamp = timestamp;
     }
 
@@ -103,5 +105,13 @@ public class Transaction {
 
     public void setDeletedDate(LocalDateTime deletedDate) {
         this.deletedDate = deletedDate;
+    }
+
+    public String getExternalReferenceId() {
+        return externalReferenceId;
+    }
+
+    public void setExternalReferenceId(String externalReferenceId) {
+        this.externalReferenceId = externalReferenceId;
     }
 }

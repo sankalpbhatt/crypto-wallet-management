@@ -9,7 +9,13 @@ import org.springframework.stereotype.Component;
 public class WalletMapper {
 
     public WalletResponse mapToResponseDto(Wallet wallet){
-        return new WalletResponse();
+        return new WalletResponse(
+                wallet.getWalletId(),
+                wallet.getId(),
+                wallet.getUserId(),
+                wallet.getCurrency(),
+                wallet.getBalance()
+        );
     }
 
     public Wallet mapRequestToEntity(CreateWalletRequest request){
