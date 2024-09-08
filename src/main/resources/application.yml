@@ -9,8 +9,8 @@ spring:
     baselineOnMigrate: true
   datasource:
     url: jdbc:postgresql://localhost:5432/crypto
-    username: crypto
-    password: crypto@123
+    username: postgres
+    password: postgres
   jpa:
     hibernate:
       ddl-auto: none
