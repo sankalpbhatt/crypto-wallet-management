@@ -11,6 +11,7 @@ spring:
     url: jdbc:postgresql://localhost:5432/crypto
     username: postgres
     password: postgres
+    driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: none
@@ -19,8 +20,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 flyway:
-  locations: classpath:db/migration
-  schema: crypto
+  defaultSchema: crypto
 
 logging:
   level:

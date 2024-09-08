@@ -12,9 +12,11 @@ import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
 import com.crypto.wallet.entity.TransactionType;
 import com.crypto.wallet.service.WalletService;
+import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@Service
 public class TransactionServiceImpl extends SequenceGeneratorServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;

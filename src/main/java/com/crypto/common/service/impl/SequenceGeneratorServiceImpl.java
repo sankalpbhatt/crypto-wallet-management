@@ -15,7 +15,7 @@ public class SequenceGeneratorServiceImpl {
 
     @Transactional
     public long getNextSequenceValue(SequenceType sequenceType) {
-        SequenceGenerator sequenceGenerator = sequenceGeneratorRepository.findById(sequenceType.name())
+        SequenceGenerator sequenceGenerator = sequenceGeneratorRepository.findBySequenceType(sequenceType.name())
                 .orElseThrow(() -> new RuntimeException("Sequence type not found"));
 
         long nextValue = sequenceGenerator.getCurrentValue() + 1;

@@ -35,7 +35,7 @@ public class WalletController {
         return walletService.getWalletById(id);
     }
 
-    @PutMapping("{/id}")
+    @PutMapping("/{id}")
     public WalletResponse updateWallet(@PathVariable("id") String id, @RequestBody UpdateWalletRequest updateWalletRequest){
         return walletService.updateWallet(id, updateWalletRequest);
     }

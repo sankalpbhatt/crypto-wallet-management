@@ -11,16 +11,15 @@ import jakarta.persistence.Table;
 public class SequenceGenerator {
 
     @Id
-    @Enumerated(EnumType.STRING)
-    private SequenceType sequenceType;
+    private String sequenceType;
 
     private long currentValue;
 
-    public SequenceType getSequenceType() {
+    public String getSequenceType() {
         return sequenceType;
     }
 
-    public void setSequenceType(SequenceType sequenceType) {
+    public void setSequenceType(String sequenceType) {
         this.sequenceType = sequenceType;
     }
 

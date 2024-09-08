@@ -2,22 +2,16 @@ version: '3.8'
 
 services:
   db:
-    image: postgres:15
+    image: postgres:14
     container_name: crypto-db
     environment:
-      POSTGRES_DB: crypto          # This should create the "crypto" database
-      POSTGRES_USER: postgres       # Superuser for the initial connection
-      POSTGRES_PASSWORD: your-postgres-password
+      POSTGRES_DB: crypto
+      POSTGRES_USER: crypto
+      POSTGRES_PASSWORD: crypto@123
     ports:
       - "5432:5432"
     volumes:
       - crypto-db-data:/var/lib/postgresql/data
-    networks:
-      - crypto-network
 
 volumes:
   crypto-db-data:
-
-networks:
-  crypto-network:
-    driver: bridge
