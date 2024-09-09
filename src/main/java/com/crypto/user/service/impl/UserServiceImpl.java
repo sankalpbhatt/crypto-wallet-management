@@ -2,6 +2,8 @@ package com.crypto.user.service.impl;
 
 import com.crypto.common.entity.SequenceType;
 import com.crypto.common.service.impl.SequenceGeneratorServiceImpl;
+import com.crypto.exception.MyServiceException;
+import com.crypto.exception.model.ErrorCode;
 import com.crypto.user.dto.CreateUserRequest;
 import com.crypto.user.dto.UserResponse;
 import com.crypto.user.entity.User;
@@ -13,10 +15,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
 public class UserServiceImpl  extends SequenceGeneratorServiceImpl implements UserService {
+
+    private static final String ERROR_MESSAGE_USER_NOT_FOUND = "User Not found";
+    private static final Random random = new Random();
+    private static final Integer randomBound = 1501;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -29,24 +36,42 @@ public class UserServiceImpl  extends SequenceGeneratorServiceImpl implements Us
     @Override
     @Transactional
     public UserResponse createUser(CreateUserRequest request) {
+        validateUserAlreadyExists(request);
+
         String userId = SequenceType.USER.getPrefix() + getNextSequenceValue(SequenceType.USER);
-        User user = userMapper.mapToEntity(request);
+        int hashIterations = random.nextInt(randomBound) + 500;
+        User user = userMapper.mapToEntity(request, hashIterations);
         user.setUserId(userId);
-        return userMapper.mapToDto(userRepository.save(user));
+
+        return userMapper.mapToResponseDto(userRepository.save(user));
+    }
+
+    private void validateUserAlreadyExists(CreateUserRequest request) {
+        if (userRepository.existsByEmail(request.email())) {
+            throw new MyServiceException("Email already exists", ErrorCode.BUSINESS_ERROR);
+        }
     }
 
     @Override
     @Transactional(readOnly = true)
     public UserResponse getUser(String id) {
-        User user = userRepository.findByUserId(id).orElseThrow(() -> new NoSuchElementException("User Not found"));
-        return userMapper.mapToDto(user);
+        User user = userRepository.findByUserId(id)
+                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+        return userMapper.mapToResponseDto(user);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponse getUserByInternalId(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+        return userMapper.mapToResponseDto(user);    }
 
     @Override
     @Transactional
     public User updateUser(UUID id, User updatedUser) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("User not found"));
+                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
         user.setFirstName(updatedUser.getFirstName());
         user.setLastName(updatedUser.getLastName());
         user.setPhone(updatedUser.getPhone());

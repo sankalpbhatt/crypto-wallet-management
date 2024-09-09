@@ -3,7 +3,7 @@ package com.crypto.transaction.mapper;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.Transaction;
-import com.crypto.wallet.entity.TransactionStatus;
+import com.crypto.transaction.entity.TransactionStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -20,10 +20,10 @@ public class TransactionMapper {
     public Transaction mapToEntity(CreateTransactionRequest createTransactionRequest, UUID walletId){
         Transaction transaction = new Transaction();
         transaction.setWalletId(walletId);
-        transaction.setTransactionType(createTransactionRequest.getType());
+        transaction.setType(createTransactionRequest.getType());
         transaction.setAmount(createTransactionRequest.getAmount());
         transaction.setStatus(TransactionStatus.PENDING);
-        transaction.setTimestamp(LocalDateTime.now());
+        transaction.setTransactionTime(LocalDateTime.now());
         transaction.setExternalReferenceId(createTransactionRequest.getExternalReferenceId());
         return transaction;
     }

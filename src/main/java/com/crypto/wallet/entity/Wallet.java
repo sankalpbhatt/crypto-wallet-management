@@ -1,5 +1,6 @@
 package com.crypto.wallet.entity;
 
+import com.crypto.wallet.dto.Currency;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -7,11 +8,10 @@ import org.hibernate.annotations.Generated;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Currency;
 import java.util.UUID;
 
-@Table
 @Entity
+@Table(name = "wallets", schema = "crypto")
 public class Wallet {
 
     @Id
@@ -23,9 +23,9 @@ public class Wallet {
     private String publicKey;
     private String encryptedPrivateKey;
     private BigDecimal balance;
-    private LocalDateTime createdDate = LocalDateTime.now();
-    private LocalDateTime updatedDate;
-    private LocalDateTime deletedDate;
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     public UUID getId() {
         return id;
@@ -83,27 +83,27 @@ public class Wallet {
         this.balance = balance;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public LocalDateTime getUpdatedDate() {
-        return updatedDate;
+        return updatedAt;
     }
 
-    public void setUpdatedDate(LocalDateTime updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedDate(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getDeletedDate() {
-        return deletedDate;
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
     }
 
-    public void setDeletedDate(LocalDateTime deletedDate) {
-        this.deletedDate = deletedDate;
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 }

@@ -1,4 +1,4 @@
-package com.crypto.wallet.entity;
+package com.crypto.transaction.entity;
 
 public enum TransactionStatus {
     PENDING,

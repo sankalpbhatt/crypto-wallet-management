@@ -1,5 +1,8 @@
 package com.crypto.user.utils;
 
+import com.crypto.exception.MyServiceException;
+import com.crypto.exception.model.ErrorCode;
+
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,21 +10,16 @@ import java.util.Random;
 
 public class HashUtils {
 
-    private static final Random random = new Random();
-    private static final Integer randomBound = 1501;
-
-    public static String hashPhrase(String phrase) {
-        return bytesToHex(convertToHashByte(phrase));
+    public static String hashPhrase(String phrase, int hashIterations) {
+        return bytesToHex(convertToHashByte(phrase, hashIterations));
     }
 
-    private static byte[] convertToHashByte(String phrase) {
+    private static byte[] convertToHashByte(String phrase, int hashIterations) {
         MessageDigest digest;
-        int hashIterations = random.nextInt(randomBound) + 500;
-
         try {
             digest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new MyServiceException("Error while creating Message digest", ErrorCode.GENERAL, e);
         }
         byte[] hash = phrase.getBytes(StandardCharsets.UTF_8);
         for (int i = 0; i < hashIterations; i++) {

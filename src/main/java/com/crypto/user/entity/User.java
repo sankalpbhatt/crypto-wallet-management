@@ -3,12 +3,14 @@ package com.crypto.user.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.Generated;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity(name = "user")
+@Entity
+@Table(name = "users", schema = "crypto")
 public class User {
     @Id
     @Generated
@@ -19,6 +21,7 @@ public class User {
     private String phone;
     private String email;
     private String password;
+    private Integer hashIteration;
     private LocalDateTime createdDate = LocalDateTime.now();
     private LocalDateTime updatedDate;
     private LocalDateTime deletedDate;
@@ -26,12 +29,13 @@ public class User {
         // Do Nothing
     }
 
-    public User(String firstName, String lastName, String phone, String email, String password) {
+    public User(String firstName, String lastName, String phone, String email, String password, Integer hashIteration) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
         this.email = email;
         this.password = password;
+        this.hashIteration = hashIteration;
     }
 
     public UUID getId() {
@@ -90,27 +94,15 @@ public class User {
         this.password = password;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public Integer getHashIteration() {
+        return hashIteration;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
+    public void setHashIteration(Integer hashIteration) {
+        this.hashIteration = hashIteration;
     }
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
-    }
-
-    public LocalDateTime getDeletedDate() {
-        return deletedDate;
-    }
-
-    public void setDeletedDate(LocalDateTime deletedDate) {
-        this.deletedDate = deletedDate;
     }
 }

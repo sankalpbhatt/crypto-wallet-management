@@ -13,6 +13,6 @@ public record CreateUserRequest (
     String phone,
     @Schema(description = "Email of the user")
     String email,
-    @Schema(description = "First name of the user")
+    @Schema(hidden = true)
     String password
 ){}

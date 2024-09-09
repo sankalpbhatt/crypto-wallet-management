@@ -1,7 +1,7 @@
 package com.crypto.transaction.dto.request;
 
 import com.crypto.wallet.dto.Currency;
-import com.crypto.wallet.entity.TransactionType;
+import com.crypto.transaction.entity.TransactionType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 

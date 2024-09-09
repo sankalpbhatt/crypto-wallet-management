@@ -18,6 +18,8 @@ public class SequenceGeneratorServiceImpl {
         SequenceGenerator sequenceGenerator = sequenceGeneratorRepository.findBySequenceType(sequenceType.name())
                 .orElseThrow(() -> new RuntimeException("Sequence type not found"));
 
+
+        // TODO : Sequence generator is updating even for failed scenarios
         long nextValue = sequenceGenerator.getCurrentValue() + 1;
         sequenceGenerator.setCurrentValue(nextValue);
         sequenceGeneratorRepository.save(sequenceGenerator);

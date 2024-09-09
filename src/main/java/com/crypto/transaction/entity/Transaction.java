@@ -1,17 +1,16 @@
 package com.crypto.transaction.entity;
 
-import com.crypto.wallet.entity.TransactionStatus;
-import com.crypto.wallet.entity.TransactionType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import org.hibernate.annotations.Generated;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
+@Table(name = "transactions", schema = "crypto")
 public class Transaction {
     @Id
     @Generated
@@ -19,13 +18,13 @@ public class Transaction {
     private String transactionId;
     private UUID walletId;
     private BigDecimal amount;
-    private TransactionType transactionType;
+    private TransactionType type;
     private TransactionStatus status;
-    private LocalDateTime timestamp;
+    private LocalDateTime transactionTime;
     private String externalReferenceId;
-    private LocalDateTime createdDate = LocalDateTime.now();
-    private LocalDateTime updatedDate;
-    private LocalDateTime deletedDate;
+    private LocalDateTime createdAt = LocalDateTime.now();
+    private LocalDateTime updatedAt;
+    private LocalDateTime deletedAt;
 
     public UUID getId() {
         return id;
@@ -59,12 +58,12 @@ public class Transaction {
         this.amount = amount;
     }
 
-    public TransactionType getTransactionType() {
-        return transactionType;
+    public TransactionType getType() {
+        return type;
     }
 
-    public void setTransactionType(TransactionType transactionType) {
-        this.transactionType = transactionType;
+    public void setType(TransactionType type) {
+        this.type = type;
     }
 
     public TransactionStatus getStatus() {
@@ -75,36 +74,36 @@ public class Transaction {
         this.status = status;
     }
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
+    public LocalDateTime getTransactionTime() {
+        return transactionTime;
     }
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
+    public void setTransactionTime(LocalDateTime transactionTime) {
+        this.transactionTime = transactionTime;
     }
 
-    public LocalDateTime getCreatedDate() {
-        return createdDate;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreatedDate(LocalDateTime createdDate) {
-        this.createdDate = createdDate;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public LocalDateTime getUpdatedDate() {
-        return updatedDate;
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdatedDate(LocalDateTime updatedDate) {
-        this.updatedDate = updatedDate;
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public LocalDateTime getDeletedDate() {
-        return deletedDate;
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
     }
 
-    public void setDeletedDate(LocalDateTime deletedDate) {
-        this.deletedDate = deletedDate;
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
     }
 
     public String getExternalReferenceId() {

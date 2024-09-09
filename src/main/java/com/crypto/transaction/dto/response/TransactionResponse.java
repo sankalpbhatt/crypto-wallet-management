@@ -1,11 +1,10 @@
 package com.crypto.transaction.dto.response;
 
-import com.crypto.wallet.entity.TransactionStatus;
-import com.crypto.wallet.entity.TransactionType;
+import com.crypto.transaction.entity.TransactionStatus;
+import com.crypto.transaction.entity.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class TransactionResponse {

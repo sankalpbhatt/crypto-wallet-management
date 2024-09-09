@@ -1,9 +1,9 @@
 package com.crypto.wallet.dto.response;
 
+import com.crypto.wallet.dto.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.UUID;
 
 public class WalletResponse {
@@ -12,21 +12,27 @@ public class WalletResponse {
 
     @JsonIgnore
     private UUID internalId;
-    private UUID userId;
+    private String userId;
     private Currency currency;
     private BigDecimal balance;
 
     public WalletResponse() {
     }
 
-    public WalletResponse(String id, UUID userId, Currency currency, BigDecimal balance) {
+    public WalletResponse(String id, String userId, Currency currency, BigDecimal balance) {
         this.id = id;
         this.userId = userId;
         this.currency = currency;
         this.balance = balance;
     }
 
-    public WalletResponse(String id, UUID internalId, UUID userId, Currency currency, BigDecimal balance) {
+    public WalletResponse(String id, Currency currency, BigDecimal balance) {
+        this.id = id;
+        this.currency = currency;
+        this.balance = balance;
+    }
+
+    public WalletResponse(String id, UUID internalId, String userId, Currency currency, BigDecimal balance) {
         this.id = id;
         this.internalId = internalId;
         this.userId = userId;
@@ -42,11 +48,11 @@ public class WalletResponse {
         this.id = id;
     }
 
-    public UUID getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(UUID userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

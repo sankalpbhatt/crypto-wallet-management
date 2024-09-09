@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS crypto.users (
     phone VARCHAR(255),
     email VARCHAR(255) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    hash_iteration NUMERIC NOT NULL,
     created_date TIMESTAMP NOT NULL DEFAULT now(),
     updated_date TIMESTAMP,
     deleted_date TIMESTAMP
@@ -34,7 +35,7 @@ CREATE TABLE IF NOT EXISTS crypto.wallets (
     encrypted_private_key VARCHAR(255) NOT NULL,
     balance DOUBLE PRECISION NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES crypto.users(id)
 );
@@ -49,7 +50,7 @@ CREATE TABLE IF NOT EXISTS crypto.transactions (
     status VARCHAR(20),
     transaction_time TIMESTAMP,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
-    updated_at TIMESTAMP NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
     external_reference_id VARCHAR(100) UNIQUE,
     FOREIGN KEY (wallet_id) REFERENCES crypto.wallets(id)

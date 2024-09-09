@@ -2,6 +2,8 @@ package com.crypto.transaction.service.impl;
 
 import com.crypto.common.entity.SequenceType;
 import com.crypto.common.service.impl.SequenceGeneratorServiceImpl;
+import com.crypto.exception.MyServiceException;
+import com.crypto.exception.model.ErrorCode;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.Transaction;
@@ -10,7 +12,7 @@ import com.crypto.transaction.repository.TransactionRepository;
 import com.crypto.transaction.service.TransactionService;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
-import com.crypto.wallet.entity.TransactionType;
+import com.crypto.transaction.entity.TransactionType;
 import com.crypto.wallet.service.WalletService;
 import org.springframework.stereotype.Service;
 
@@ -50,7 +52,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
                                         WalletResponse walletResponse) {
         int compareBalance = walletResponse.getBalance().compareTo(createTransactionRequest.getAmount());
         if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
-            throw new RuntimeException("Insufficient Funds");
+            throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
         }
     }
 

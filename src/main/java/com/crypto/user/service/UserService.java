@@ -11,6 +11,7 @@ public interface UserService {
     UserResponse createUser(CreateUserRequest request);
 
     UserResponse getUser(String id);
+    UserResponse getUserByInternalId(UUID id);
 
     @Transactional
     User updateUser(UUID id, User updatedUser);
