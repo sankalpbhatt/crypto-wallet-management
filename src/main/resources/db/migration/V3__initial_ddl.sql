@@ -39,14 +39,14 @@ CREATE TABLE IF NOT EXISTS crypto.wallets (
 );
 
 -- Create transaction Table
-CREATE TABLE wallet_balances (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    wallet_id BIGINT NOT NULL,
+CREATE TABLE crypto.wallet_balances (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    wallet_id UUID NOT NULL,
     currency VARCHAR(50) NOT NULL,
     balance DECIMAL(18, 8) DEFAULT 0.0,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP,
-    FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE
+    FOREIGN KEY (wallet_id) REFERENCES crypto.wallets(id) ON DELETE CASCADE
 );
 
 -- Create transaction Table

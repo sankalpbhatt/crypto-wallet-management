@@ -1,6 +1,5 @@
 package com.crypto.wallet.dto.request;
 
-import com.crypto.wallet.dto.Currency;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 
@@ -8,13 +7,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class CreateWalletRequest {
 
     private String userId;
-    private Currency currency;
     private String publicKey;
     private String encryptedPrivateKey;
 
-    public CreateWalletRequest(String userId, Currency currency, String publicKey, String encryptedPrivateKey) {
+    public CreateWalletRequest(String userId, String publicKey, String encryptedPrivateKey) {
         this.userId = userId;
-        this.currency = currency;
         this.publicKey = publicKey;
         this.encryptedPrivateKey = encryptedPrivateKey;
     }
@@ -25,14 +22,6 @@ public class CreateWalletRequest {
 
     public void setUserId(String userId) {
         this.userId = userId;
-    }
-
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
     }
 
     public String getPublicKey() {

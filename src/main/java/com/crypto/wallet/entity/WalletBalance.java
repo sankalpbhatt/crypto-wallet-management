@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "wallet_balances")
+@Table(name = "wallet_balances", schema = "crypto")
 public class WalletBalance {
 
     @Id
@@ -81,5 +81,8 @@ public class WalletBalance {
         this.wallet = wallet;
         this.currency = currency;
         this.balance = balance;
+    }
+
+    public WalletBalance() {
     }
 }

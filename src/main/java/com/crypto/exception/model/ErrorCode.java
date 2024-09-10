@@ -1,9 +1,9 @@
 package com.crypto.exception.model;
 
 public enum ErrorCode {
-    GENERAL("E0001", "General Error"),
-    BUSINESS_ERROR("E0002", "Business Error"),
-    PERMISSION("E0003", "Permission Issue");
+    GENERAL("E0001", "General Error : %s"),
+    BUSINESS_ERROR("E0002", "Business Error : %s"),
+    PERMISSION("E0003", "Permission Issue : %s");
 
     private final String code;
     private final String message;

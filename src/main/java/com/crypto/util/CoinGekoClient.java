@@ -2,60 +2,47 @@ package com.crypto.util;
 
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.math.BigDecimal;
-import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.util.Map;
 
 @Component
 public class CoinGekoClient {
 
-    private final URL url;
+    private final RestTemplate restTemplate;
+    @Value("${api.coingecko.url}")
+    String apiUrl;
 
-    public CoinGekoClient(@Value("api.coingeko.url") String apiUrl) throws MalformedURLException {
-        url = new URL(apiUrl);
+    public CoinGekoClient(RestTemplate restTemplate) throws MalformedURLException {
+        this.restTemplate = restTemplate;
     }
 
-    public BigDecimal fetchPrice(String crypto){
-        HttpURLConnection con = null;
-        try{
-            con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod(HttpMethod.GET.name());
-
-            int responseCode = 0;
-            responseCode = con.getResponseCode();
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader in = null;
-                in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-                while (true) {
-                    try {
-                        if (!((inputLine = in.readLine()) != null)) break;
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    response.append(inputLine);
+    public BigDecimal fetchPrice(String crypto) {
+        try {
+            ResponseEntity<Map> response = restTemplate.getForEntity(apiUrl, Map.class);
+            if (response.getStatusCode() == HttpStatus.OK) {
+                Map<String, Map<String, Object>> jsonResponse = response.getBody();
+                if (jsonResponse != null && jsonResponse.containsKey(crypto)) {
+                    Map<String, Object> cryptoData = jsonResponse.get(crypto);
+                    return new BigDecimal(cryptoData.get("usd").toString());
+                } else {
+                    throw new MyServiceException(
+                            "Cryptocurrency not found in the response: " + crypto, ErrorCode.GENERAL);
                 }
-                JSONObject jsonResponse = new JSONObject(response.toString());
-                BigDecimal price = jsonResponse.getJSONObject(crypto).getBigDecimal("usd");
-                return price;
-
-
             } else {
-                throw new MyServiceException("Failed to fetch prices", ErrorCode.BUSINESS_ERROR);
+                throw new MyServiceException(
+                        "Failed to fetch crypto prices. Status code: " + response.getStatusCode(), ErrorCode.GENERAL);
             }
-        }catch (IOException e) {
-        throw new MyServiceException("Exception in reading Coin price", ErrorCode.GENERAL, e);
-    }
+        } catch (RestClientException e) {
+            throw new MyServiceException(
+                    "Error occurred while fetching prices: " + e.getMessage(), ErrorCode.GENERAL, e);
+        }
     }
 }

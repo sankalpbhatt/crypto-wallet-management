@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,8 +67,8 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         UserResponse userResponse = userService.getUserByInternalId(wallet.getUserId());
 
         BigDecimal balance = null;
-        for(WalletBalance walletBalance: wallet.getBalances()){
-            if(Objects.isNull(balance)){
+        for (WalletBalance walletBalance : wallet.getBalances()) {
+            if (Objects.isNull(balance)) {
                 balance = walletBalance.getBalance();
             }
             balance.add(walletBalance.getBalance());
@@ -93,22 +92,29 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         UserResponse userResponse = userService.getUserByInternalId(wallet.getUserId());
         WalletResponse walletResponse = walletMapper.mapToResponseDto(walletRepository.save(wallet), userResponse.id());
         Map<String, BigDecimal> balances = new HashMap<>();
-        for(WalletBalance b : wallet.getBalances()){
+        for (WalletBalance b : wallet.getBalances()) {
             balances.put(b.getCurrency().name(), b.getBalance());
-            calculateWalletValue(b.getBalance(), b.getCurrency());
-            walletResponse.setBalance(walletResponse.getBalance().add(calculateWalletValue(b.getBalance(), b.getCurrency())));
+            if (Objects.isNull(walletResponse.getBalance())) {
+                walletResponse
+                        .setBalance(calculateWalletValue(b.getBalance(), b.getCurrency()));
+            } else {
+                walletResponse
+                        .setBalance(calculateWalletValue(b.getBalance(), b.getCurrency()).add(walletResponse.getBalance()));
+            }
         }
         walletResponse.setBalances(balances);
         return walletResponse;
     }
 
-    private static WalletBalance getTotalWalletBalance(UpdateWalletRequest updateWalletRequest, Wallet wallet, Optional<WalletBalance> walletBalanceOptional) {
+    private static WalletBalance getTotalWalletBalance(UpdateWalletRequest updateWalletRequest,
+                                                       Wallet wallet,
+                                                       Optional<WalletBalance> walletBalanceOptional) {
         WalletBalance walletBalance = null;
-        if(walletBalanceOptional.isPresent()){
+        if (walletBalanceOptional.isPresent()) {
             walletBalance = walletBalanceOptional.get();
             walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
             walletBalance.setUpdatedAt(LocalDateTime.now());
-        }else{
+        } else {
             walletBalance =
                     new WalletBalance(wallet, updateWalletRequest.getCurrency(), updateWalletRequest.getBalance());
         }
@@ -124,7 +130,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         walletRepository.save(wallet);
     }
 
-    private BigDecimal calculateWalletValue(BigDecimal value, Currency currency){
+    private BigDecimal calculateWalletValue(BigDecimal value, Currency currency) {
         BigDecimal coinPrice = coinGekoClient.fetchPrice(currency.name().toLowerCase());
         return value.multiply(coinPrice);
     }
