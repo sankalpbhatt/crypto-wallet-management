@@ -1,7 +1,8 @@
 package com.crypto.transaction.service.impl;
 
 import com.crypto.common.entity.SequenceType;
-import com.crypto.common.service.impl.SequenceGeneratorServiceImpl;
+import com.crypto.common.repository.SequenceGeneratorRepository;
+import com.crypto.common.service.SequenceGeneratorServiceImpl;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
@@ -23,13 +24,16 @@ import java.util.NoSuchElementException;
 public class TransactionServiceImpl extends SequenceGeneratorServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
+    private final SequenceGeneratorRepository sequenceGeneratorRepository;
     private final WalletService walletService;
     protected final TransactionMapper transactionMapper;
 
     public TransactionServiceImpl(TransactionRepository transactionRepository,
+                                  SequenceGeneratorRepository sequenceGeneratorRepository,
                                   WalletService walletService,
                                   TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
+        this.sequenceGeneratorRepository = sequenceGeneratorRepository;
         this.walletService = walletService;
         this.transactionMapper = transactionMapper;
     }
@@ -44,7 +48,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         Transaction transaction = transactionMapper
                 .mapToEntity(createTransactionRequest, walletResponse.getInternalId());
         String transactionId = SequenceType.TRANSACTION.getPrefix() +
-                getNextSequenceValue(SequenceType.TRANSACTION);
+                getNextSequenceValue(SequenceType.TRANSACTION, sequenceGeneratorRepository);
         transaction.setTransactionId(transactionId);
         transaction = transactionRepository.save(transaction);
         return transactionMapper.mapToResponseDto(transaction);

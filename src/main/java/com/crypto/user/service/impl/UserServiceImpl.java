@@ -1,7 +1,8 @@
 package com.crypto.user.service.impl;
 
 import com.crypto.common.entity.SequenceType;
-import com.crypto.common.service.impl.SequenceGeneratorServiceImpl;
+import com.crypto.common.repository.SequenceGeneratorRepository;
+import com.crypto.common.service.SequenceGeneratorServiceImpl;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
 import com.crypto.user.dto.CreateUserRequest;
@@ -19,17 +20,21 @@ import java.util.Random;
 import java.util.UUID;
 
 @Service
-public class UserServiceImpl  extends SequenceGeneratorServiceImpl implements UserService {
+public class UserServiceImpl extends SequenceGeneratorServiceImpl implements UserService {
 
     private static final String ERROR_MESSAGE_USER_NOT_FOUND = "User Not found";
     private static final Random random = new Random();
     private static final Integer randomBound = 1501;
 
     private final UserRepository userRepository;
+    private final SequenceGeneratorRepository sequenceGeneratorRepository;
     private final UserMapper userMapper;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository,
+                           SequenceGeneratorRepository sequenceGeneratorRepository,
+                           UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.sequenceGeneratorRepository = sequenceGeneratorRepository;
         this.userMapper = userMapper;
     }
 
@@ -38,7 +43,7 @@ public class UserServiceImpl  extends SequenceGeneratorServiceImpl implements Us
     public UserResponse createUser(CreateUserRequest request) {
         validateUserAlreadyExists(request);
 
-        String userId = SequenceType.USER.getPrefix() + getNextSequenceValue(SequenceType.USER);
+        String userId = SequenceType.USER.getPrefix() + getNextSequenceValue(SequenceType.USER, sequenceGeneratorRepository);
         int hashIterations = random.nextInt(randomBound) + 500;
         User user = userMapper.mapToEntity(request, hashIterations);
         user.setUserId(userId);
@@ -65,7 +70,8 @@ public class UserServiceImpl  extends SequenceGeneratorServiceImpl implements Us
     public UserResponse getUserByInternalId(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
-        return userMapper.mapToResponseDto(user);    }
+        return userMapper.mapToResponseDto(user);
+    }
 
     @Override
     @Transactional

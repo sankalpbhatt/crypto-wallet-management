@@ -24,21 +24,7 @@ public class WalletResponse {
         this.id = id;
         this.userId = userId;
     }
-
-    public WalletResponse(String id, String currency, BigDecimal balance) {
-        this.id = id;
-        this.currency = currency;
-        this.balance = balance;
-    }
-
-    public WalletResponse(String id, UUID internalId, String userId, String currency, BigDecimal balance) {
-        this.id = id;
-        this.internalId = internalId;
-        this.userId = userId;
-        this.currency = currency;
-        this.balance = balance;
-    }
-
+    
     public String getId() {
         return id;
     }

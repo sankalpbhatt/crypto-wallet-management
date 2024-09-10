@@ -1,7 +1,8 @@
 package com.crypto.wallet.service.impl;
 
 import com.crypto.common.entity.SequenceType;
-import com.crypto.common.service.impl.SequenceGeneratorServiceImpl;
+import com.crypto.common.repository.SequenceGeneratorRepository;
+import com.crypto.common.service.SequenceGeneratorServiceImpl;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
 import com.crypto.user.dto.UserResponse;
@@ -35,17 +36,20 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
     private final UserService userService;
     private final CoinGekoClient coinGekoClient;
     private final WalletBalanceRepository walletBalanceRepository;
+    private final SequenceGeneratorRepository sequenceGeneratorRepository;
 
     public WalletServiceImpl(WalletRepository walletRepository,
                              WalletMapper walletMapper,
                              UserService userService,
                              CoinGekoClient coinGekoClient,
-                             WalletBalanceRepository walletBalanceRepository) {
+                             WalletBalanceRepository walletBalanceRepository,
+                             SequenceGeneratorRepository sequenceGeneratorRepository) {
         this.walletRepository = walletRepository;
         this.walletMapper = walletMapper;
         this.userService = userService;
         this.coinGekoClient = coinGekoClient;
         this.walletBalanceRepository = walletBalanceRepository;
+        this.sequenceGeneratorRepository = sequenceGeneratorRepository;
     }
 
     @Transactional
@@ -53,7 +57,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
     public WalletResponse createWallet(CreateWalletRequest createWalletRequest) {
         UserResponse userResponse = userService.getUser(createWalletRequest.getUserId());
         Wallet wallet = walletMapper.mapRequestToEntity(createWalletRequest, userResponse.internalId());
-        String walletId = SequenceType.WALLET.getPrefix() + getNextSequenceValue(SequenceType.WALLET);
+        String walletId = SequenceType.WALLET.getPrefix() + getNextSequenceValue(SequenceType.WALLET, sequenceGeneratorRepository);
         wallet.setWalletId(walletId);
         return walletMapper
                 .mapToResponseDto(walletRepository.save(wallet), createWalletRequest.getUserId());
