@@ -13,6 +13,15 @@ public class SequenceGenerator {
 
     private long currentValue;
 
+
+    public SequenceGenerator() {
+    }
+
+    public SequenceGenerator(String sequenceType, long currentValue) {
+        this.sequenceType = sequenceType;
+        this.currentValue = currentValue;
+    }
+
     public String getSequenceType() {
         return sequenceType;
     }

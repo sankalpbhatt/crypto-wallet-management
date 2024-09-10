@@ -10,23 +10,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.CompletableFuture;
+
 @RestController
 @RequestMapping("/transaction")
 public class TransactionController {
 
     private final TransactionService transactionService;
 
-    public TransactionController(TransactionService transactionService){
+    public TransactionController(TransactionService transactionService) {
         this.transactionService = transactionService;
     }
 
     @PostMapping
-    public TransactionResponse createTransaction(@RequestBody CreateTransactionRequest createTransactionRequest){
+    public CompletableFuture<TransactionResponse> createTransaction(@RequestBody CreateTransactionRequest createTransactionRequest) {
         return transactionService.createTransaction(createTransactionRequest);
     }
 
     @GetMapping("{id}")
-    public TransactionResponse getTransactionById(@PathVariable("id") String id){
+    public TransactionResponse getTransactionById(@PathVariable("id") String id) {
         return transactionService.getTransactionById(id);
     }
 }

@@ -15,6 +15,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -37,18 +39,18 @@ class TransactionControllerTest {
     }
 
     @Test
-    void shouldCreateTransaction() {
+    void shouldCreateTransaction() throws ExecutionException, InterruptedException {
         CreateTransactionRequest createTransactionRequest = Mockito.mock(CreateTransactionRequest.class);
-        TransactionResponse response = new TransactionResponse("T001",
+        CompletableFuture<TransactionResponse> response = CompletableFuture.supplyAsync(() -> new TransactionResponse("T001",
                 "1231424",
                 BigDecimal.ONE,
                 TransactionType.SEND,
                 TransactionStatus.CONFIRMED,
-                null);
+                null));
         when(transactionService.createTransaction(any())).thenReturn(response);
-        TransactionResponse actualResponse = transactionController.createTransaction(createTransactionRequest);
+        CompletableFuture<TransactionResponse> actualResponse = transactionController.createTransaction(createTransactionRequest);
         verify(transactionService).createTransaction(createTransactionRequest);
-        assertThat(actualResponse).isEqualTo(response);
+        assertThat(actualResponse.get()).isEqualTo(response.get());
     }
 
     @Test

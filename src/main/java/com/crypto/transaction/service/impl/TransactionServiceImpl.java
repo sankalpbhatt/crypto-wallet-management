@@ -8,6 +8,7 @@ import com.crypto.exception.model.ErrorCode;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.Transaction;
+import com.crypto.transaction.entity.TransactionStatus;
 import com.crypto.transaction.entity.TransactionType;
 import com.crypto.transaction.mapper.TransactionMapper;
 import com.crypto.transaction.repository.TransactionRepository;
@@ -18,7 +19,10 @@ import com.crypto.wallet.service.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class TransactionServiceImpl extends SequenceGeneratorServiceImpl implements TransactionService {
@@ -40,7 +44,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
 
     @Override
     @Transactional
-    public TransactionResponse createTransaction(CreateTransactionRequest createTransactionRequest) {
+    public CompletableFuture<TransactionResponse> createTransaction(CreateTransactionRequest createTransactionRequest) {
         WalletResponse walletResponse = walletService.getWalletById(createTransactionRequest.getWalletId());
         validateRequest(createTransactionRequest, walletResponse);
         UpdateWalletRequest updateWalletRequest = createUpdateWalletRequest(createTransactionRequest);
@@ -51,7 +55,24 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
                 getNextSequenceValue(SequenceType.TRANSACTION, sequenceGeneratorRepository);
         transaction.setTransactionId(transactionId);
         transaction = transactionRepository.save(transaction);
-        return transactionMapper.mapToResponseDto(transaction);
+        Transaction finalTransaction = transaction;
+        return CompletableFuture.supplyAsync(() -> {
+            try {
+                TimeUnit.SECONDS.sleep(5);
+
+                finalTransaction.setStatus(TransactionStatus.CONFIRMED);
+                finalTransaction.setUpdatedAt(LocalDateTime.now());
+                transactionRepository.save(finalTransaction);
+                return transactionMapper.mapToResponseDto(finalTransaction);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                finalTransaction.setStatus(TransactionStatus.FAILED);
+                finalTransaction.setUpdatedAt(LocalDateTime.now());
+                transactionRepository.save(finalTransaction);
+                return transactionMapper.mapToResponseDto(finalTransaction);
+            }
+        });
+
     }
 
     private static void validateRequest(CreateTransactionRequest createTransactionRequest,
