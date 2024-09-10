@@ -12,12 +12,16 @@ import java.util.UUID;
 @Component
 public class TransactionMapper {
 
-    public TransactionResponse mapToResponseDto(Transaction transaction){
-        TransactionResponse transactionResponse = null;
+    public TransactionResponse mapToResponseDto(Transaction transaction) {
+        TransactionResponse transactionResponse = new TransactionResponse(transaction.getTransactionId(),
+                transaction.getAmount(),
+                transaction.getType(),
+                transaction.getStatus(),
+                transaction.getTransactionTime());
         return transactionResponse;
     }
 
-    public Transaction mapToEntity(CreateTransactionRequest createTransactionRequest, UUID walletId){
+    public Transaction mapToEntity(CreateTransactionRequest createTransactionRequest, UUID walletId) {
         Transaction transaction = new Transaction();
         transaction.setWalletId(walletId);
         transaction.setType(createTransactionRequest.getType());

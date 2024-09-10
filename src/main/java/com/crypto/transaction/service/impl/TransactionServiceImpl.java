@@ -56,23 +56,30 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         transaction.setTransactionId(transactionId);
         transaction = transactionRepository.save(transaction);
         Transaction finalTransaction = transaction;
+        return getTransactionResponseCompletableFuture(walletResponse, finalTransaction);
+
+    }
+
+    private CompletableFuture<TransactionResponse> getTransactionResponseCompletableFuture(WalletResponse walletResponse, Transaction finalTransaction) {
         return CompletableFuture.supplyAsync(() -> {
             try {
-                TimeUnit.SECONDS.sleep(5);
-
+                TimeUnit.SECONDS.sleep(2);
                 finalTransaction.setStatus(TransactionStatus.CONFIRMED);
                 finalTransaction.setUpdatedAt(LocalDateTime.now());
                 transactionRepository.save(finalTransaction);
-                return transactionMapper.mapToResponseDto(finalTransaction);
+                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction);
+                transactionResponse.setWalletId(walletResponse.getId());
+                return transactionResponse;
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 finalTransaction.setStatus(TransactionStatus.FAILED);
                 finalTransaction.setUpdatedAt(LocalDateTime.now());
                 transactionRepository.save(finalTransaction);
-                return transactionMapper.mapToResponseDto(finalTransaction);
+                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction);
+                transactionResponse.setWalletId(walletResponse.getId());
+                return transactionResponse;
             }
         });
-
     }
 
     private static void validateRequest(CreateTransactionRequest createTransactionRequest,

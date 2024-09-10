@@ -3,11 +3,15 @@ package com.crypto.filter;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.crypto.exception.MyServiceException;
+import com.crypto.exception.model.ErrorCode;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -18,6 +22,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
+@Component
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Value("${publicKey}")
@@ -28,7 +33,13 @@ public class SecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String header = request.getHeader("Authorization");
+        if (StringUtils.isEmpty(header)) {
+            throw new MyServiceException("Authorization header missing", ErrorCode.PERMISSION);
+        }
         String jwtToken = header.substring(7);
+        if (StringUtils.isEmpty(jwtToken)) {
+            throw new MyServiceException("Authorization jwtToken", ErrorCode.PERMISSION);
+        }
         try {
             decodeJWTToken(jwtToken);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
