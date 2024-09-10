@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.UrlPathHelper;
 
 import java.io.IOException;
 import java.security.KeyFactory;
@@ -28,6 +29,11 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Value("${publicKey}")
     private String pubKey;
 
+    private static final String[] SWAGGER_PATHS = {"/swagger-ui/index.html",
+            "/swagger-ui/",
+            "/v3/api-docs/swagger-config",
+            "/v3/api-docs",
+            "/v2/api-docs"};
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -46,6 +52,17 @@ public class SecurityFilter extends OncePerRequestFilter {
             throw new RuntimeException(e);
         }
         filterChain.doFilter(request, response);
+    }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String requestURI = new UrlPathHelper().getPathWithinApplication(request);
+        for (String path : SWAGGER_PATHS) {
+            if (requestURI.startsWith(path)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void decodeJWTToken(String jwtToken) throws NoSuchAlgorithmException, InvalidKeySpecException {
