@@ -30,14 +30,23 @@ CREATE TABLE IF NOT EXISTS crypto.wallets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     wallet_id VARCHAR(25) UNIQUE NOT NULL,
     user_id UUID,
-    currency VARCHAR(25) NOT NULL,
     public_key VARCHAR(255) NOT NULL,
     encrypted_private_key VARCHAR(255) NOT NULL,
-    balance DOUBLE PRECISION NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT now(),
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES crypto.users(id)
+    FOREIGN KEY (user_id) REFERENCES crypto.users(id) ON DELETE CASCADE
+);
+
+-- Create transaction Table
+CREATE TABLE wallet_balances (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    wallet_id BIGINT NOT NULL,
+    currency VARCHAR(50) NOT NULL,
+    balance DECIMAL(18, 8) DEFAULT 0.0,
+    created_at TIMESTAMP NOT NULL DEFAULT now(),
+    updated_at TIMESTAMP,
+    FOREIGN KEY (wallet_id) REFERENCES wallets(id) ON DELETE CASCADE
 );
 
 -- Create transaction Table
@@ -53,5 +62,5 @@ CREATE TABLE IF NOT EXISTS crypto.transactions (
     updated_at TIMESTAMP,
     deleted_at TIMESTAMP,
     external_reference_id VARCHAR(100) UNIQUE,
-    FOREIGN KEY (wallet_id) REFERENCES crypto.wallets(id)
+    FOREIGN KEY (wallet_id) REFERENCES crypto.wallets(id) ON DELETE CASCADE
 )

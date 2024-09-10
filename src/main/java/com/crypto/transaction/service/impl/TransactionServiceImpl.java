@@ -15,6 +15,7 @@ import com.crypto.wallet.dto.response.WalletResponse;
 import com.crypto.transaction.entity.TransactionType;
 import com.crypto.wallet.service.WalletService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -34,6 +35,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
     }
 
     @Override
+    @Transactional
     public TransactionResponse createTransaction(CreateTransactionRequest createTransactionRequest) {
         WalletResponse walletResponse = walletService.getWalletById(createTransactionRequest.getWalletId());
         validateRequest(createTransactionRequest, walletResponse);
@@ -68,6 +70,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
     }
 
     @Override
+    @Transactional(readOnly = true)
     public TransactionResponse getTransactionById(String id) {
         Transaction transaction = transactionRepository.findByTransactionId(id)
                 .orElseThrow(() -> new NoSuchElementException("Wallet not found"));

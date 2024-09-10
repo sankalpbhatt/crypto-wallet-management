@@ -1,7 +1,8 @@
 package com.crypto.wallet.dto.request;
 
+import com.crypto.wallet.dto.Currency;
+
 import java.math.BigDecimal;
-import java.util.Currency;
 import java.util.UUID;
 
 public class UpdateWalletRequest {
@@ -13,6 +14,7 @@ public class UpdateWalletRequest {
     private Operation operation;
 
     private BigDecimal balance;
+    private Currency currency;
 
     public UpdateWalletRequest() {
     }
@@ -36,5 +38,13 @@ public class UpdateWalletRequest {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public Currency getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(Currency currency) {
+        this.currency = currency;
     }
 }

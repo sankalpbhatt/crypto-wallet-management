@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.json:json:20211205'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 

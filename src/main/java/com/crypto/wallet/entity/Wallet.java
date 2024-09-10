@@ -1,13 +1,18 @@
 package com.crypto.wallet.entity;
 
 import com.crypto.wallet.dto.Currency;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.Generated;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -19,10 +24,11 @@ public class Wallet {
     private UUID id;
     private String walletId;
     private UUID userId;
-    private Currency currency;
     private String publicKey;
     private String encryptedPrivateKey;
-    private BigDecimal balance;
+    @OneToMany(mappedBy = "wallet", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<WalletBalance> balances = new ArrayList<>();
+
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt;
     private LocalDateTime deletedAt;
@@ -51,14 +57,6 @@ public class Wallet {
         this.userId = userId;
     }
 
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
     public String getPublicKey() {
         return publicKey;
     }
@@ -75,12 +73,20 @@ public class Wallet {
         this.encryptedPrivateKey = encryptedPrivateKey;
     }
 
-    public BigDecimal getBalance() {
-        return balance;
+    public List<WalletBalance> getBalances() {
+        return balances;
     }
 
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
+    public void setBalances(List<WalletBalance> balances) {
+        this.balances = balances;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -89,14 +95,6 @@ public class Wallet {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedDate() {
-        return updatedAt;
-    }
-
-    public void setUpdatedDate(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public LocalDateTime getDeletedAt() {

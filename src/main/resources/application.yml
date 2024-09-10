@@ -22,6 +22,9 @@ spring:
 flyway:
   defaultSchema: crypto
 
+api:
+  coingecko:
+    url: https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd
 logging:
   level:
     jakarta:

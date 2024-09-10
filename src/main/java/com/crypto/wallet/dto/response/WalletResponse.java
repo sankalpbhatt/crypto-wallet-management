@@ -4,6 +4,7 @@ import com.crypto.wallet.dto.Currency;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 public class WalletResponse {
@@ -15,15 +16,14 @@ public class WalletResponse {
     private String userId;
     private Currency currency;
     private BigDecimal balance;
+    private Map<String, BigDecimal> balances;
 
     public WalletResponse() {
     }
 
-    public WalletResponse(String id, String userId, Currency currency, BigDecimal balance) {
+    public WalletResponse(String id, String userId) {
         this.id = id;
         this.userId = userId;
-        this.currency = currency;
-        this.balance = balance;
     }
 
     public WalletResponse(String id, Currency currency, BigDecimal balance) {
@@ -78,5 +78,13 @@ public class WalletResponse {
 
     public void setInternalId(UUID internalId) {
         this.internalId = internalId;
+    }
+
+    public Map<String, BigDecimal> getBalances() {
+        return balances;
+    }
+
+    public void setBalances(Map<String, BigDecimal> balances) {
+        this.balances = balances;
     }
 }
