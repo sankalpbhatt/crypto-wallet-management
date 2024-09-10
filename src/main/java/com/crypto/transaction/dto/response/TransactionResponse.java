@@ -5,19 +5,18 @@ import com.crypto.transaction.entity.TransactionType;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 public class TransactionResponse {
 
     private String transactionId;
-    private UUID walletId;
+    private String walletId;
     private BigDecimal amount;
     private TransactionType transactionType;
     private TransactionStatus status;
     private LocalDateTime timestamp;
 
     public TransactionResponse(String transactionId,
-                               UUID walletId,
+                               String walletId,
                                BigDecimal amount,
                                TransactionType transactionType,
                                TransactionStatus status,
