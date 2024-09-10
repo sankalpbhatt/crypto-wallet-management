@@ -7,12 +7,12 @@ import com.crypto.exception.model.ErrorCode;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.Transaction;
+import com.crypto.transaction.entity.TransactionType;
 import com.crypto.transaction.mapper.TransactionMapper;
 import com.crypto.transaction.repository.TransactionRepository;
 import com.crypto.transaction.service.TransactionService;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
-import com.crypto.transaction.entity.TransactionType;
 import com.crypto.wallet.service.WalletService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +43,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         walletService.updateWallet(walletResponse.getId(), updateWalletRequest);
         Transaction transaction = transactionMapper
                 .mapToEntity(createTransactionRequest, walletResponse.getInternalId());
-        String transactionId = SequenceType.TRANSACTION.getPrefix()+
+        String transactionId = SequenceType.TRANSACTION.getPrefix() +
                 getNextSequenceValue(SequenceType.TRANSACTION);
         transaction.setTransactionId(transactionId);
         transaction = transactionRepository.save(transaction);
@@ -52,7 +52,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
 
     private static void validateRequest(CreateTransactionRequest createTransactionRequest,
                                         WalletResponse walletResponse) {
-        int compareBalance = walletResponse.getBalance().compareTo(createTransactionRequest.getAmount());
+        int compareBalance = createTransactionRequest.getAmount().compareTo(walletResponse.getBalance());
         if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
             throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
         }

@@ -69,11 +69,15 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         BigDecimal balance = null;
         for (WalletBalance walletBalance : wallet.getBalances()) {
             if (Objects.isNull(balance)) {
-                balance = walletBalance.getBalance();
+                balance = calculateWalletValue(walletBalance.getBalance(), walletBalance.getCurrency());
+            } else {
+                balance.add(calculateWalletValue(walletBalance.getBalance(), walletBalance.getCurrency()));
             }
-            balance.add(walletBalance.getBalance());
         }
-        return walletMapper.mapToResponseDto(wallet, userResponse.id());
+        WalletResponse walletResponse = walletMapper.mapToResponseDto(wallet, userResponse.id());
+        walletResponse.setBalance(balance);
+        walletResponse.setCurrency("USD");
+        return walletResponse;
     }
 
     @Transactional
