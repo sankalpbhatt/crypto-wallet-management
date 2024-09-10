@@ -1,6 +1,8 @@
 package com.crypto.transaction.entity;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.Generated;
@@ -18,7 +20,9 @@ public class Transaction {
     private String transactionId;
     private UUID walletId;
     private BigDecimal amount;
+    @Enumerated(EnumType.STRING)
     private TransactionType type;
+    @Enumerated(EnumType.STRING)
     private TransactionStatus status;
     private LocalDateTime transactionTime;
     private String externalReferenceId;

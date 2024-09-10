@@ -70,6 +70,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         } else if (createTransactionRequest.getType() == TransactionType.RECEIVE) {
             updateWalletRequest.setOperation(UpdateWalletRequest.Operation.ADD);
         }
+        updateWalletRequest.setCurrency(createTransactionRequest.getCurrency());
         return updateWalletRequest;
     }
 

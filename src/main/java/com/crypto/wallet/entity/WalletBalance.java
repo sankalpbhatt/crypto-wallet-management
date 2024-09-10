@@ -2,6 +2,8 @@ package com.crypto.wallet.entity;
 
 import com.crypto.wallet.dto.Currency;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -22,6 +24,7 @@ public class WalletBalance {
     @ManyToOne
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
+    @Enumerated(EnumType.STRING)
     private Currency currency;
     private BigDecimal balance;
     private LocalDateTime createdAt = LocalDateTime.now();
