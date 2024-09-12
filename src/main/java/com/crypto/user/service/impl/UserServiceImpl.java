@@ -14,7 +14,6 @@ import com.crypto.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Random;
 import java.util.UUID;
@@ -71,19 +70,5 @@ public class UserServiceImpl extends SequenceGeneratorServiceImpl implements Use
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
         return userMapper.mapToResponseDto(user);
-    }
-
-    @Override
-    @Transactional
-    public User updateUser(UUID id, User updatedUser) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
-        user.setFirstName(updatedUser.getFirstName());
-        user.setLastName(updatedUser.getLastName());
-        user.setPhone(updatedUser.getPhone());
-        user.setEmail(updatedUser.getEmail());
-        user.setPassword(updatedUser.getPassword());
-        user.setUpdatedDate(LocalDateTime.now());
-        return userRepository.save(user);
     }
 }
