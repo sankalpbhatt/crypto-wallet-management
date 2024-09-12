@@ -8,6 +8,9 @@ public class CreateWalletRequest {
 
     private String userId;
 
+    public CreateWalletRequest() {
+    }
+
     public CreateWalletRequest(String userId) {
         this.userId = userId;
     }

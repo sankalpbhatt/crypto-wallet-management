@@ -102,7 +102,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
             }
         }
         WalletResponse walletResponse = walletMapper.mapToResponseDto(wallet, userResponse.id());
-        walletResponse.setBalance(balance);
+        walletResponse.setBalance(balance != null ? balance : BigDecimal.ZERO);
         walletResponse.setCurrency("USD");
         return walletResponse;
     }

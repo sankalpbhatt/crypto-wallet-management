@@ -29,6 +29,7 @@ public class WalletResponse {
     public WalletResponse(String id, String userId) {
         this.id = id;
         this.userId = userId;
+        this.balance = BigDecimal.ZERO;
     }
 
     public WalletResponse(String id, String userId, String encryptedKey, String publicKey) {
