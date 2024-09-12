@@ -11,6 +11,12 @@ public class WalletResponse {
     private String id;
 
     @JsonIgnore
+    private String encryptedKey;
+
+    @JsonIgnore
+    private String publicKey;
+
+    @JsonIgnore
     private UUID internalId;
     private String userId;
     private String currency;
@@ -24,7 +30,14 @@ public class WalletResponse {
         this.id = id;
         this.userId = userId;
     }
-    
+
+    public WalletResponse(String id, String userId, String encryptedKey, String publicKey) {
+        this.id = id;
+        this.userId = userId;
+        this.encryptedKey = encryptedKey;
+        this.publicKey = publicKey;
+    }
+
     public String getId() {
         return id;
     }
@@ -71,5 +84,21 @@ public class WalletResponse {
 
     public void setBalances(Map<String, BigDecimal> balances) {
         this.balances = balances;
+    }
+
+    public String getEncryptedKey() {
+        return encryptedKey;
+    }
+
+    public void setEncryptedKey(String encryptedKey) {
+        this.encryptedKey = encryptedKey;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
     }
 }

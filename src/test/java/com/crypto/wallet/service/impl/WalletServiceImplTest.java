@@ -75,7 +75,7 @@ class WalletServiceImplTest {
 
     @Test
     public void shouldCreateWallet() {
-        CreateWalletRequest request = new CreateWalletRequest("U001", "key", "Key");
+        CreateWalletRequest request = new CreateWalletRequest("U001");
         UUID internalUserId = UUID.randomUUID();
 
         WalletResponse expectedResponse = new WalletResponse();

@@ -3,6 +3,7 @@ package com.crypto.transaction.service.impl;
 import com.crypto.common.entity.SequenceGenerator;
 import com.crypto.common.entity.SequenceType;
 import com.crypto.common.repository.SequenceGeneratorRepository;
+import com.crypto.exception.MyServiceException;
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.Transaction;
@@ -22,8 +23,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -73,5 +77,67 @@ class TransactionServiceImplTest {
         CompletableFuture<TransactionResponse> transactionResponse = transactionService.createTransaction(createTransactionRequest);
         Thread.sleep(5000);
         verify(transactionRepository, times(2)).save(any());
+    }
+
+    @Test
+    void shouldCreateTransactionSuccessfully() throws Exception {
+        // Arrange
+        UUID internalId = UUID.randomUUID();
+        CreateTransactionRequest request = new CreateTransactionRequest();
+        request.setWalletId("W001");
+        request.setAmount(new BigDecimal(100));
+        request.setType(TransactionType.SEND);
+        request.setCurrency(Currency.ETHEREUM);
+        request.setSignature("signature");
+
+        WalletResponse walletResponse = new WalletResponse();
+        walletResponse.setId("W001");
+        walletResponse.setInternalId(internalId);
+        walletResponse.setBalance(new BigDecimal(200));
+        walletResponse.setEncryptedKey("encryptedKey");
+
+        Transaction transaction = new Transaction();
+        transaction.setTransactionId("T001");
+
+        when(walletService.getWalletById(request.getWalletId())).thenReturn(walletResponse);
+        when(transactionMapper.mapToEntity(request, walletResponse.getInternalId())).thenReturn(transaction);
+        when(sequenceGeneratorRepository.findBySequenceType(anyString()))
+                .thenReturn(Optional.of(new SequenceGenerator(SequenceType.TRANSACTION.name(), 1L)));
+        when(transactionRepository.save(transaction)).thenReturn(transaction);
+        when(transactionMapper.mapToResponseDto(any()))
+                .thenReturn(new TransactionResponse("T001", "W001",
+                        new BigDecimal(200), TransactionType.SEND, TransactionStatus.CONFIRMED, null));
+
+        // Act
+        CompletableFuture<TransactionResponse> futureResponse = transactionService.createTransaction(request);
+        TransactionResponse response = futureResponse.join();
+
+        // Assert
+        assertThat(response).isNotNull();
+        assertThat(response.getWalletId()).isEqualTo(walletResponse.getId());
+        assertThat(response.getStatus()).isEqualTo(TransactionStatus.CONFIRMED);
+    }
+
+    @Test
+    void shouldThrowExceptionForInsufficientFunds() {
+        // Arrange
+        UUID internalId = UUID.randomUUID();
+        CreateTransactionRequest request = new CreateTransactionRequest();
+        request.setWalletId("W001");
+        request.setAmount(new BigDecimal(300));
+        request.setType(TransactionType.SEND);
+        request.setCurrency(Currency.ETHEREUM);
+
+        WalletResponse walletResponse = new WalletResponse();
+        walletResponse.setId("W001");
+        walletResponse.setInternalId(internalId);
+        walletResponse.setBalance(new BigDecimal(200));
+
+        when(walletService.getWalletById(request.getWalletId())).thenReturn(walletResponse);
+
+        // Act & Assert
+        assertThatThrownBy(() -> transactionService.createTransaction(request))
+                .isInstanceOf(MyServiceException.class)
+                .hasMessageContaining("Insufficient Funds");
     }
 }

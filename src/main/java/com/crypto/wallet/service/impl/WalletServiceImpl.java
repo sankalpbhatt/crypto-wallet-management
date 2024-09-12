@@ -8,6 +8,7 @@ import com.crypto.exception.model.ErrorCode;
 import com.crypto.user.dto.UserResponse;
 import com.crypto.user.service.UserService;
 import com.crypto.util.CoinGekoClient;
+import com.crypto.util.CryptoUtils;
 import com.crypto.wallet.dto.Currency;
 import com.crypto.wallet.dto.request.CreateWalletRequest;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;
@@ -18,10 +19,14 @@ import com.crypto.wallet.mapper.WalletMapper;
 import com.crypto.wallet.repository.WalletBalanceRepository;
 import com.crypto.wallet.repository.WalletRepository;
 import com.crypto.wallet.service.WalletService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +35,9 @@ import java.util.Optional;
 
 @Service
 public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements WalletService {
+
+    @Value("${private.key.phrase}")
+    private String passPhrase;
 
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
@@ -58,9 +66,24 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         UserResponse userResponse = userService.getUser(createWalletRequest.getUserId());
         Wallet wallet = walletMapper.mapRequestToEntity(createWalletRequest, userResponse.internalId());
         String walletId = SequenceType.WALLET.getPrefix() + getNextSequenceValue(SequenceType.WALLET, sequenceGeneratorRepository);
+        populateKeyPair(wallet);
         wallet.setWalletId(walletId);
         return walletMapper
                 .mapToResponseDto(walletRepository.save(wallet), createWalletRequest.getUserId());
+    }
+
+    private void populateKeyPair(Wallet wallet) {
+        KeyPair keyPair = CryptoUtils.generateKeyPair();
+        PublicKey publicKey = keyPair.getPublic();
+        PrivateKey privateKey = keyPair.getPrivate();
+
+        String publicKeyStr = CryptoUtils.convertKeyToString(publicKey);
+        String privateKeyStr = CryptoUtils.convertKeyToString(privateKey);
+
+        String encryptedPrivateKey = CryptoUtils.encryptPrivateKey(privateKeyStr, passPhrase);
+
+        wallet.setEncryptedPrivateKey(encryptedPrivateKey);
+        wallet.setPublicKey(publicKeyStr);
     }
 
     @Transactional(readOnly = true)

@@ -1,7 +1,7 @@
 package com.crypto.transaction.dto.request;
 
-import com.crypto.wallet.dto.Currency;
 import com.crypto.transaction.entity.TransactionType;
+import com.crypto.wallet.dto.Currency;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 
@@ -27,6 +27,8 @@ public class CreateTransactionRequest {
 
     @NotNull
     private Currency currency;
+
+    private String signature;
 
     public String getWalletId() {
         return walletId;
@@ -66,5 +68,13 @@ public class CreateTransactionRequest {
 
     public void setCurrency(Currency currency) {
         this.currency = currency;
+    }
+
+    public String getSignature() {
+        return signature;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
     }
 }

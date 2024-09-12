@@ -13,9 +13,11 @@ import com.crypto.transaction.entity.TransactionType;
 import com.crypto.transaction.mapper.TransactionMapper;
 import com.crypto.transaction.repository.TransactionRepository;
 import com.crypto.transaction.service.TransactionService;
+import com.crypto.util.CryptoUtils;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
 import com.crypto.wallet.service.WalletService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +28,9 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class TransactionServiceImpl extends SequenceGeneratorServiceImpl implements TransactionService {
+
+    @Value("${private.key.phrase}")
+    private String passPhrase;
 
     private final TransactionRepository transactionRepository;
     private final SequenceGeneratorRepository sequenceGeneratorRepository;
@@ -82,11 +87,15 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         });
     }
 
-    private static void validateRequest(CreateTransactionRequest createTransactionRequest,
-                                        WalletResponse walletResponse) {
+    private void validateRequest(CreateTransactionRequest createTransactionRequest,
+                                 WalletResponse walletResponse) {
         int compareBalance = createTransactionRequest.getAmount().compareTo(walletResponse.getBalance());
         if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
-            throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
+            if (compareBalance > 0) {
+                throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
+            }
+            String privateKey = CryptoUtils.decryptPrivateKey(walletResponse.getEncryptedKey(), passPhrase);
+            CryptoUtils.decryptSignature(createTransactionRequest.getSignature(), CryptoUtils.getPrivateKeyFromString(privateKey));
         }
     }
 
