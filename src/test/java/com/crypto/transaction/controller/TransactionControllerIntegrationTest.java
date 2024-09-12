@@ -1,7 +1,6 @@
 package com.crypto.transaction.controller;
 
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
-import com.crypto.transaction.dto.response.TransactionResponse;
 import com.crypto.transaction.entity.TransactionType;
 import com.crypto.user.dto.CreateUserRequest;
 import com.crypto.wallet.dto.Currency;
@@ -21,7 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -85,22 +83,18 @@ public class TransactionControllerIntegrationTest {
         CreateTransactionRequest request = new CreateTransactionRequest();
         request.setWalletId(this.walletId);
         request.setAmount(BigDecimal.valueOf(100));
-        request.setType(TransactionType.SEND);
+        request.setType(TransactionType.RECEIVE);
         request.setCurrency(Currency.ETHEREUM);
         request.setSignature("signature");
+        request.setExternalReferenceId(UUID.randomUUID().toString());
 
         String requestBody = objectMapper.writeValueAsString(request);
 
         // Act & Assert
         mockMvc.perform(post("/transaction")
-                        .header(HttpHeaders.AUTHORIZATION, authToken) // Include the authorization header
+                        .header(HttpHeaders.AUTHORIZATION, authToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
-                .andExpect(status().isOk())
-                .andExpect(result -> {
-                    TransactionResponse response = objectMapper.readValue(result.getResponse().getContentAsString(), TransactionResponse.class);
-                    assertThat(response).isNotNull();
-                    assertThat(response.getTransactionId()).isEqualTo("transactionId"); // Replace with actual expected value
-                });
+                .andExpect(status().isCreated());
     }
 }

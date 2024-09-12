@@ -140,10 +140,14 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
     private static WalletBalance getTotalWalletBalance(UpdateWalletRequest updateWalletRequest,
                                                        Wallet wallet,
                                                        Optional<WalletBalance> walletBalanceOptional) {
-        WalletBalance walletBalance = null;
+        WalletBalance walletBalance;
         if (walletBalanceOptional.isPresent()) {
             walletBalance = walletBalanceOptional.get();
-            walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
+            if (updateWalletRequest.getOperation() == UpdateWalletRequest.Operation.ADD) {
+                walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
+            } else {
+                walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
+            }
             walletBalance.setUpdatedAt(LocalDateTime.now());
         } else {
             walletBalance =
