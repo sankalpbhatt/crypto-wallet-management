@@ -131,6 +131,12 @@ fetched from the key `exampleJwt` in application.yml.
 NOTE: This repo has currently hardcoded the keys in yml but for security reasons it is best to store in some kind of key
 vault. For e.g. AWS Secret Manager.
 
+### Verify DB
+
+Use the credentials mentioned in application.yml to connect to DB client of your own choice. This application is
+configured to create schema on startup, so you should have schema and tables created. Once the APIs are executed,
+relevant resources will be created in their respective tables.
+
 ## Issues
 
 For raising any issues please use the issue
