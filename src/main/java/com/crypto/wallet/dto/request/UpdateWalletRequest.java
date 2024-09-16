@@ -1,9 +1,9 @@
 package com.crypto.wallet.dto.request;
 
 import com.crypto.wallet.dto.Currency;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 public class UpdateWalletRequest {
 
@@ -11,9 +11,13 @@ public class UpdateWalletRequest {
         ADD, SUBTRACT
     }
 
+    @NotNull
     private Operation operation;
 
+    @NotNull
     private BigDecimal balance;
+
+    @NotNull
     private Currency currency;
 
     public UpdateWalletRequest() {
@@ -22,6 +26,12 @@ public class UpdateWalletRequest {
     public UpdateWalletRequest(Operation operation, BigDecimal balance) {
         this.operation = operation;
         this.balance = balance;
+    }
+
+    public UpdateWalletRequest(Operation operation, BigDecimal balance, Currency currency) {
+        this.operation = operation;
+        this.balance = balance;
+        this.currency = currency;
     }
 
     public Operation getOperation() {

@@ -21,6 +21,7 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 
 public class CryptoUtils {
@@ -42,7 +43,7 @@ public class CryptoUtils {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
-    public static String encryptData(String data, PublicKey publicKey) {
+    public static String encryptSignature(String data, PublicKey publicKey) {
         try {
             Cipher cipher = Cipher.getInstance(TRANSFORMATION);
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
@@ -61,60 +62,44 @@ public class CryptoUtils {
         }
     }
 
-    public static String convertKeyToString(PrivateKey key) {
-        return Base64.getEncoder().encodeToString(key.getEncoded());
-    }
-
-    public static String encryptPrivateKey(String privateKeyStr, String encryptionPassword) {
+    public static String encryptPrivateKey(PrivateKey privateKey, String encryptionPassword) {
         try {
-            SecretKeyFactory factory;
-
-            factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            // Create SecretKey from password
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(encryptionPassword.toCharArray(), "salt".getBytes(), 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
+            // Encrypt private key bytes directly
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, secret);
-            byte[] encryptedBytes = cipher.doFinal(Base64.getDecoder().decode(privateKeyStr));
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encryptedBytes = cipher.doFinal(privateKey.getEncoded());
+
+            // Return encrypted private key as a Base64 encoded string
             return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (RuntimeException | InvalidKeyException e) {
-            throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
-        } catch (NoSuchPaddingException e) {
-            throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
-        } catch (IllegalBlockSizeException e) {
-            throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
-        } catch (InvalidKeySpecException e) {
-            throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
-        } catch (BadPaddingException e) {
+        } catch (Exception e) {
             throw new MyServiceException("Error while encrypting private key", ErrorCode.GENERAL, e);
         }
     }
 
-    public static String decryptPrivateKey(String encryptedPrivateKeyStr, String encryptionPassword) {
+    public static PrivateKey decryptPrivateKey(String encryptedPrivateKeyStr, String encryptionPassword) {
         try {
+            // Create SecretKey from password
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(encryptionPassword.toCharArray(), "salt".getBytes(), 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
-            SecretKeySpec secret = new SecretKeySpec(tmp.getEncoded(), "AES");
+            SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
+            // Decrypt the private key bytes
             Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, secret);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedPrivateKeyStr));
-            return Base64.getEncoder().encodeToString(decryptedBytes);
-        } catch (RuntimeException | InvalidKeyException e) {
-            throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
-        } catch (NoSuchPaddingException e) {
-            throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
-        } catch (IllegalBlockSizeException e) {
-            throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
-        } catch (InvalidKeySpecException e) {
-            throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
-        } catch (BadPaddingException e) {
+
+            // Rebuild the PrivateKey object from the decrypted bytes
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decryptedBytes);
+            return keyFactory.generatePrivate(keySpec);
+        } catch (Exception e) {
             throw new MyServiceException("Error while decrypting private key", ErrorCode.GENERAL, e);
         }
     }
@@ -143,6 +128,20 @@ public class CryptoUtils {
             return keyFactory.generatePrivate(keySpec);
         } catch (InvalidKeySpecException e) {
             throw new MyServiceException("Error while generating private key from String", ErrorCode.GENERAL, e);
+        }
+    }
+
+    public static PublicKey getPublicKeyFromString(String publicKeyStr) {
+        try {
+            byte[] keyBytes = Base64.getDecoder().decode(publicKeyStr);
+
+            KeyFactory keyFactory = KeyFactory.getInstance(ALGORITHM);
+
+            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
+
+            return keyFactory.generatePublic(keySpec);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new MyServiceException("Error while converting string to PublicKey", ErrorCode.GENERAL, e);
         }
     }
 }

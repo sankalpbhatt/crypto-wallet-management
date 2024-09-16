@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.PrivateKey;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
@@ -92,7 +93,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         int compareBalance = 0;
         if (!walletResponse.getBalances().containsKey(createTransactionRequest.getCurrency().name())) {
             throw new MyServiceException(
-                    String.format("No funds with currency: {}", createTransactionRequest.getCurrency()), ErrorCode.BUSINESS_ERROR);
+                    String.format("No funds with currency: %s", createTransactionRequest.getCurrency()), ErrorCode.BUSINESS_ERROR);
         } else {
             compareBalance = createTransactionRequest
                     .getAmount()
@@ -102,8 +103,8 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
         if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
             throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
         }
-        String privateKey = CryptoUtils.decryptPrivateKey(walletResponse.getEncryptedKey(), passPhrase);
-        CryptoUtils.decryptSignature(createTransactionRequest.getSignature(), CryptoUtils.getPrivateKeyFromString(privateKey));
+        PrivateKey privateKey = CryptoUtils.decryptPrivateKey(walletResponse.getEncryptedKey(), passPhrase);
+        CryptoUtils.decryptSignature(createTransactionRequest.getSignature(), privateKey);
     }
 
     private static UpdateWalletRequest createUpdateWalletRequest(CreateTransactionRequest createTransactionRequest) {

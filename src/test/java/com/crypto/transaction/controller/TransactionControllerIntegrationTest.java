@@ -5,6 +5,7 @@ import com.crypto.transaction.entity.TransactionType;
 import com.crypto.user.dto.CreateUserRequest;
 import com.crypto.wallet.dto.Currency;
 import com.crypto.wallet.dto.request.CreateWalletRequest;
+import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +22,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -75,6 +77,16 @@ public class TransactionControllerIntegrationTest {
         );
 
         this.walletId = walletResponse.getId();
+
+        UpdateWalletRequest updateWalletRequest = new UpdateWalletRequest(
+                UpdateWalletRequest.Operation.ADD, new BigDecimal(10), Currency.ETHEREUM);
+        String updateWalletRequestBody = objectMapper.writeValueAsString(updateWalletRequest);
+
+        mockMvc.perform(put("/wallet/{id}", this.walletId)
+                        .header(HttpHeaders.AUTHORIZATION, authToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(updateWalletRequestBody))
+                .andExpect(status().is(HttpStatus.OK.value()));
     }
 
     @Test

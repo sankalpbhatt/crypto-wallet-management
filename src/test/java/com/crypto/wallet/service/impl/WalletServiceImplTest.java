@@ -116,13 +116,13 @@ class WalletServiceImplTest {
                 "9089786756",
                 "qwe@gmail.com"));
 
-        when(coinGekoClient.fetchPrice(anyString())).thenReturn(BigDecimal.valueOf(50000));
+        when(coinGekoClient.fetchPrice(anyString())).thenReturn(BigDecimal.valueOf(50));
         when(walletMapper.mapToResponseDto(any(Wallet.class), anyString())).thenReturn(new WalletResponse());
         WalletResponse response = walletService.getWalletById("WALLET123");
 
         assertNotNull(response);
         assertThat("USD").isEqualTo(response.getCurrency());
-        assertThat(BigDecimal.valueOf(50000).multiply(BigDecimal.valueOf(1.0))).isEqualTo(response.getBalance());
+        assertThat(BigDecimal.valueOf(2500000.0)).isEqualTo(response.getBalance());
     }
 
     @Test

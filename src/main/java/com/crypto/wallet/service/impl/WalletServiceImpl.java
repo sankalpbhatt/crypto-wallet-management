@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.security.KeyPair;
-import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -75,12 +74,10 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
     private void populateKeyPair(Wallet wallet) {
         KeyPair keyPair = CryptoUtils.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
-        PrivateKey privateKey = keyPair.getPrivate();
 
         String publicKeyStr = CryptoUtils.convertKeyToString(publicKey);
-        String privateKeyStr = CryptoUtils.convertKeyToString(privateKey);
 
-        String encryptedPrivateKey = CryptoUtils.encryptPrivateKey(privateKeyStr, passPhrase);
+        String encryptedPrivateKey = CryptoUtils.encryptPrivateKey(keyPair.getPrivate(), passPhrase);
 
         wallet.setEncryptedPrivateKey(encryptedPrivateKey);
         wallet.setPublicKey(publicKeyStr);

@@ -18,7 +18,9 @@ public class WalletMapper {
     public WalletResponse mapToResponseDto(Wallet wallet, String userId) {
         WalletResponse walletResponse = new WalletResponse(
                 wallet.getWalletId(),
-                userId
+                userId,
+                wallet.getEncryptedPrivateKey(),
+                wallet.getPublicKey()
         );
         walletResponse.setBalances(mapBalances(wallet.getBalances()));
         return walletResponse;
@@ -35,8 +37,6 @@ public class WalletMapper {
     public Wallet mapRequestToEntity(CreateWalletRequest request, UUID userId) {
         Wallet wallet = new Wallet();
         wallet.setUserId(userId);
-        wallet.setEncryptedPrivateKey("encrypted key");
-        wallet.setPublicKey("public key");
         return wallet;
     }
 }

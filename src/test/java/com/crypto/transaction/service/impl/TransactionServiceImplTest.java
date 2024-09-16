@@ -22,6 +22,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -36,6 +38,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceImplTest {
+
 
     private TransactionService transactionService;
 
@@ -61,9 +64,13 @@ class TransactionServiceImplTest {
         createTransactionRequest.setType(TransactionType.SEND);
         createTransactionRequest.setWalletId("W001");
         Transaction transaction = new Transaction();
+
+        Map<String, BigDecimal> balances = new HashMap<>();
+        balances.put(Currency.BITCOIN.name(), new BigDecimal(200));
         WalletResponse walletResponse = new WalletResponse();
         walletResponse.setBalance(BigDecimal.TEN);
         walletResponse.setCurrency("USD");
+        walletResponse.setBalances(balances);
 
         when(sequenceGeneratorRepository.findBySequenceType(anyString()))
                 .thenReturn(Optional.of(new SequenceGenerator(SequenceType.WALLET.name(), 1l)));
@@ -74,9 +81,54 @@ class TransactionServiceImplTest {
                         "T001", "W001", BigDecimal.TEN, TransactionType.SEND, TransactionStatus.PENDING, null));
         when(transactionMapper.mapToEntity(any(), any())).thenReturn(new Transaction());
 
-        CompletableFuture<TransactionResponse> transactionResponse = transactionService.createTransaction(createTransactionRequest);
+        CompletableFuture<TransactionResponse> transactionResponse =
+                transactionService.createTransaction(createTransactionRequest);
         Thread.sleep(5000);
         verify(transactionRepository, times(2)).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWithErrorNoBalanceForCurrencyCreateTransaction() {
+        CreateTransactionRequest createTransactionRequest = new CreateTransactionRequest();
+        createTransactionRequest.setAmount(BigDecimal.TEN);
+        createTransactionRequest.setCurrency(Currency.BITCOIN);
+        createTransactionRequest.setType(TransactionType.SEND);
+        createTransactionRequest.setWalletId("W001");
+
+        Map<String, BigDecimal> balances = new HashMap<>();
+        balances.put(Currency.ETHEREUM.name(), new BigDecimal(200));
+        WalletResponse walletResponse = new WalletResponse();
+        walletResponse.setBalance(BigDecimal.TEN);
+        walletResponse.setCurrency("USD");
+        walletResponse.setBalances(balances);
+
+        when(walletService.getWalletById(anyString())).thenReturn(walletResponse);
+
+        assertThatThrownBy(() -> transactionService.createTransaction(createTransactionRequest))
+                .isInstanceOf(MyServiceException.class)
+                .hasMessage("Business Error : No funds with currency: BITCOIN");
+    }
+
+    @Test
+    void shouldThrowExceptionForInsufficientBalance() {
+        CreateTransactionRequest createTransactionRequest = new CreateTransactionRequest();
+        createTransactionRequest.setAmount(BigDecimal.TEN);
+        createTransactionRequest.setCurrency(Currency.BITCOIN);
+        createTransactionRequest.setType(TransactionType.SEND);
+        createTransactionRequest.setWalletId("W001");
+
+        Map<String, BigDecimal> balances = new HashMap<>();
+        balances.put(Currency.BITCOIN.name(), new BigDecimal(5));
+        WalletResponse walletResponse = new WalletResponse();
+        walletResponse.setBalance(BigDecimal.TEN);
+        walletResponse.setCurrency("USD");
+        walletResponse.setBalances(balances);
+
+        when(walletService.getWalletById(anyString())).thenReturn(walletResponse);
+
+        assertThatThrownBy(() -> transactionService.createTransaction(createTransactionRequest))
+                .isInstanceOf(MyServiceException.class)
+                .hasMessage("Business Error : Insufficient Funds");
     }
 
     @Test
@@ -90,11 +142,14 @@ class TransactionServiceImplTest {
         request.setCurrency(Currency.ETHEREUM);
         request.setSignature("signature");
 
+        Map<String, BigDecimal> balances = new HashMap<>();
+        balances.put(Currency.ETHEREUM.name(), new BigDecimal(200));
         WalletResponse walletResponse = new WalletResponse();
         walletResponse.setId("W001");
         walletResponse.setInternalId(internalId);
-        walletResponse.setBalance(new BigDecimal(200));
+        walletResponse.setBalance(new BigDecimal(200000));
         walletResponse.setEncryptedKey("encryptedKey");
+        walletResponse.setBalances(balances);
 
         Transaction transaction = new Transaction();
         transaction.setTransactionId("T001");
@@ -128,10 +183,13 @@ class TransactionServiceImplTest {
         request.setType(TransactionType.SEND);
         request.setCurrency(Currency.ETHEREUM);
 
+        Map<String, BigDecimal> balances = new HashMap<>();
+        balances.put(Currency.ETHEREUM.name(), new BigDecimal(200));
         WalletResponse walletResponse = new WalletResponse();
         walletResponse.setId("W001");
         walletResponse.setInternalId(internalId);
         walletResponse.setBalance(new BigDecimal(200));
+        walletResponse.setBalances(balances);
 
         when(walletService.getWalletById(request.getWalletId())).thenReturn(walletResponse);
 
