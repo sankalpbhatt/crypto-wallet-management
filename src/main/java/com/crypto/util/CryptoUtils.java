@@ -3,15 +3,11 @@ package com.crypto.util;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
 
-import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -35,11 +31,11 @@ public class CryptoUtils {
         } catch (NoSuchAlgorithmException e) {
             throw new MyServiceException("Error while getting KeyPair", ErrorCode.GENERAL, e);
         }
-        keyPairGenerator.initialize(2048); // Use 2048 bits key size
+        keyPairGenerator.initialize(2048);
         return keyPairGenerator.generateKeyPair();
     }
 
-    public static String convertKeyToString(PublicKey key) {
+    public static String getStringPublicKey(PublicKey key) {
         return Base64.getEncoder().encodeToString(key.getEncoded());
     }
 
@@ -49,15 +45,7 @@ public class CryptoUtils {
             cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             byte[] encryptedBytes = cipher.doFinal(data.getBytes());
             return Base64.getEncoder().encodeToString(encryptedBytes);
-        } catch (NoSuchPaddingException e) {
-            throw new MyServiceException("Error while encrypting data", ErrorCode.GENERAL, e);
-        } catch (IllegalBlockSizeException e) {
-            throw new MyServiceException("Error while encrypting data", ErrorCode.GENERAL, e);
-        } catch (NoSuchAlgorithmException e) {
-            throw new MyServiceException("Error while encrypting data", ErrorCode.GENERAL, e);
-        } catch (BadPaddingException e) {
-            throw new MyServiceException("Error while encrypting data", ErrorCode.GENERAL, e);
-        } catch (InvalidKeyException e) {
+        } catch (Exception e) {
             throw new MyServiceException("Error while encrypting data", ErrorCode.GENERAL, e);
         }
     }
@@ -84,18 +72,15 @@ public class CryptoUtils {
 
     public static PrivateKey decryptPrivateKey(String encryptedPrivateKeyStr, String encryptionPassword) {
         try {
-            // Create SecretKey from password
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
             KeySpec spec = new PBEKeySpec(encryptionPassword.toCharArray(), "salt".getBytes(), 65536, 256);
             SecretKey tmp = factory.generateSecret(spec);
             SecretKeySpec secretKey = new SecretKeySpec(tmp.getEncoded(), "AES");
 
-            // Decrypt the private key bytes
             Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedPrivateKeyStr));
 
-            // Rebuild the PrivateKey object from the decrypted bytes
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(decryptedBytes);
             return keyFactory.generatePrivate(keySpec);

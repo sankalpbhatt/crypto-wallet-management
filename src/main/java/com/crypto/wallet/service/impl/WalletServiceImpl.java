@@ -75,7 +75,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         KeyPair keyPair = CryptoUtils.generateKeyPair();
         PublicKey publicKey = keyPair.getPublic();
 
-        String publicKeyStr = CryptoUtils.convertKeyToString(publicKey);
+        String publicKeyStr = CryptoUtils.getStringPublicKey(publicKey);
 
         String encryptedPrivateKey = CryptoUtils.encryptPrivateKey(keyPair.getPrivate(), passPhrase);
 

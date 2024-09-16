@@ -47,7 +47,7 @@ class CryptoUtilsTest {
     @Test
     void shouldConvertPublicKeyToStringSuccessfully() {
         // Act
-        String publicKeyString = CryptoUtils.convertKeyToString(keyPair.getPublic());
+        String publicKeyString = CryptoUtils.getStringPublicKey(keyPair.getPublic());
 
         // Assert
         assertThat(publicKeyString).isNotNull();
