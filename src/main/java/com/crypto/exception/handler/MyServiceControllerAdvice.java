@@ -16,7 +16,7 @@ public class MyServiceControllerAdvice {
     private static final Logger logger = LoggerFactory.getLogger(MyServiceControllerAdvice.class);
 
     @ExceptionHandler(MyServiceException.class)
-    public ResponseEntity<ErrorResponse> handlePortfolioException(MyServiceException ex) {
+    public ResponseEntity<ErrorResponse> handleMyServiceException(MyServiceException ex) {
         logError(ex);
         ErrorResponse errorResponse = new ErrorResponse(ex.getErrorCode().getCode(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, getStatusFromErrorCode(ex.getErrorCode()));
