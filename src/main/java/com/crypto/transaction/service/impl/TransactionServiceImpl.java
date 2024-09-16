@@ -89,14 +89,21 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
 
     private void validateRequest(CreateTransactionRequest createTransactionRequest,
                                  WalletResponse walletResponse) {
-        int compareBalance = createTransactionRequest.getAmount().compareTo(walletResponse.getBalance());
-        if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
-            if (compareBalance > 0) {
-                throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
-            }
-            String privateKey = CryptoUtils.decryptPrivateKey(walletResponse.getEncryptedKey(), passPhrase);
-            CryptoUtils.decryptSignature(createTransactionRequest.getSignature(), CryptoUtils.getPrivateKeyFromString(privateKey));
+        int compareBalance = 0;
+        if (!walletResponse.getBalances().containsKey(createTransactionRequest.getCurrency().name())) {
+            throw new MyServiceException(
+                    String.format("No funds with currency: {}", createTransactionRequest.getCurrency()), ErrorCode.BUSINESS_ERROR);
+        } else {
+            compareBalance = createTransactionRequest
+                    .getAmount()
+                    .compareTo(walletResponse.getBalances().get(createTransactionRequest.getCurrency().name()));
         }
+
+        if (createTransactionRequest.getType() == TransactionType.SEND && compareBalance > 0) {
+            throw new MyServiceException("Insufficient Funds", ErrorCode.BUSINESS_ERROR);
+        }
+        String privateKey = CryptoUtils.decryptPrivateKey(walletResponse.getEncryptedKey(), passPhrase);
+        CryptoUtils.decryptSignature(createTransactionRequest.getSignature(), CryptoUtils.getPrivateKeyFromString(privateKey));
     }
 
     private static UpdateWalletRequest createUpdateWalletRequest(CreateTransactionRequest createTransactionRequest) {
