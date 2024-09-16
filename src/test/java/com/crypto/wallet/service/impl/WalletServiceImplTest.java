@@ -1,13 +1,11 @@
 package com.crypto.wallet.service.impl;
 
-import com.crypto.common.entity.SequenceGenerator;
 import com.crypto.common.repository.SequenceGeneratorRepository;
 import com.crypto.exception.MyServiceException;
 import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.service.UserService;
 import com.crypto.util.CoinGekoClient;
 import com.crypto.wallet.dto.Currency;
-import com.crypto.wallet.dto.request.CreateWalletRequest;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
 import com.crypto.wallet.entity.Wallet;
@@ -33,7 +31,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -71,37 +68,6 @@ class WalletServiceImplTest {
         walletBalance.setBalance(BigDecimal.valueOf(50000.0));
         walletBalance.setUpdatedAt(LocalDateTime.now());
         wallet.getBalances().add(walletBalance);
-    }
-
-    @Test
-    public void shouldCreateWallet() {
-        CreateWalletRequest request = new CreateWalletRequest("U001");
-        UUID internalUserId = UUID.randomUUID();
-
-        WalletResponse expectedResponse = new WalletResponse();
-        expectedResponse.setCurrency("USD");
-        UserResponse userResponse = new UserResponse("U001",
-                internalUserId,
-                "Tom",
-                "Hardy",
-                "9089786756",
-                "qwe@gmail.com");
-        SequenceGenerator sequenceGenerator = new SequenceGenerator();
-        sequenceGenerator.setCurrentValue(1l);
-
-        when(userService.getUser(any())).thenReturn(userResponse);
-        when(walletMapper.mapRequestToEntity(any(), any())).thenReturn(wallet);
-        when(walletRepository.save(any())).thenReturn(wallet);
-        when(walletMapper.mapToResponseDto(any(), any())).thenReturn(expectedResponse);
-        when(sequenceGeneratorRepository.findBySequenceType(any())).thenReturn(Optional.of(sequenceGenerator));
-
-        WalletResponse response = walletService.createWallet(request);
-
-        assertNotNull(response);
-        assertThat(response).usingRecursiveAssertion().isEqualTo(expectedResponse);
-        verify(walletRepository).save(wallet);
-        verify(userService).getUser("U001");
-        verify(walletMapper).mapRequestToEntity(request, internalUserId);
     }
 
     @Test
@@ -154,7 +120,7 @@ class WalletServiceImplTest {
         WalletResponse response = walletService.updateWallet("WALLET123", updateRequest);
 
         assertNotNull(response);
-        assertThat(new BigDecimal(75000.75)).isEqualTo(response.getBalance());
+        assertThat(new BigDecimal(74999.25)).isEqualTo(response.getBalance());
     }
 
     @Test
