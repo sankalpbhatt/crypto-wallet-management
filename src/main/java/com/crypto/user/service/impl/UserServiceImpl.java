@@ -5,8 +5,9 @@ import com.crypto.common.repository.SequenceGeneratorRepository;
 import com.crypto.common.service.SequenceGeneratorServiceImpl;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
-import com.crypto.user.dto.CreateUserRequest;
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.request.CreateUserRequest;
+import com.crypto.user.dto.request.UpdateUserRequest;
+import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.entity.User;
 import com.crypto.user.mapper.UserMapper;
 import com.crypto.user.repository.UserRepository;
@@ -14,7 +15,9 @@ import com.crypto.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -70,5 +73,30 @@ public class UserServiceImpl extends SequenceGeneratorServiceImpl implements Use
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
         return userMapper.mapToResponseDto(user);
+    }
+
+    @Override
+    public void deleteUserById(String id) {
+        User user = userRepository.findByUserId(id)
+                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+        user.setDeletedDate(LocalDateTime.now());
+        userRepository.save(user);
+    }
+
+    @Override
+    public UserResponse updateUser(String id, UpdateUserRequest updateUserRequest) {
+        User user = userRepository.findByUserId(id)
+                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+        user.setUpdatedDate(LocalDateTime.now());
+        if (Objects.nonNull(updateUserRequest.getFirstName())) {
+            user.setFirstName(updateUserRequest.getFirstName());
+        }
+        if (Objects.nonNull(updateUserRequest.getLastName())) {
+            user.setLastName(updateUserRequest.getLastName());
+        }
+        if (Objects.nonNull(updateUserRequest.getPhone())) {
+            user.setPhone(updateUserRequest.getPhone());
+        }
+        return userMapper.mapToResponseDto(userRepository.save(user));
     }
 }

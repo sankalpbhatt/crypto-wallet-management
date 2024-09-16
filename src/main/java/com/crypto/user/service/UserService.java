@@ -1,7 +1,8 @@
 package com.crypto.user.service;
 
-import com.crypto.user.dto.CreateUserRequest;
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.request.CreateUserRequest;
+import com.crypto.user.dto.request.UpdateUserRequest;
+import com.crypto.user.dto.response.UserResponse;
 
 import java.util.UUID;
 
@@ -12,4 +13,8 @@ public interface UserService {
     UserResponse getUser(String id);
 
     UserResponse getUserByInternalId(UUID id);
+
+    void deleteUserById(String id);
+
+    UserResponse updateUser(String id, UpdateUserRequest updateUserRequest);
 }

@@ -5,7 +5,7 @@ import com.crypto.common.repository.SequenceGeneratorRepository;
 import com.crypto.common.service.SequenceGeneratorServiceImpl;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.service.UserService;
 import com.crypto.util.CoinGekoClient;
 import com.crypto.util.CryptoUtils;
@@ -143,7 +143,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
             if (updateWalletRequest.getOperation() == UpdateWalletRequest.Operation.ADD) {
                 walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
             } else {
-                walletBalance.setBalance(walletBalance.getBalance().add(updateWalletRequest.getBalance()));
+                walletBalance.setBalance(walletBalance.getBalance().subtract(updateWalletRequest.getBalance()));
             }
             walletBalance.setUpdatedAt(LocalDateTime.now());
         } else {

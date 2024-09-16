@@ -1,6 +1,6 @@
 package com.crypto.user.controller;
 
-import com.crypto.user.dto.CreateUserRequest;
+import com.crypto.user.dto.request.CreateUserRequest;
 import com.crypto.wallet.dto.response.WalletResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

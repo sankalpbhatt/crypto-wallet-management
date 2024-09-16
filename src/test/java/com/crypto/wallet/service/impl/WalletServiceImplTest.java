@@ -3,7 +3,7 @@ package com.crypto.wallet.service.impl;
 import com.crypto.common.entity.SequenceGenerator;
 import com.crypto.common.repository.SequenceGeneratorRepository;
 import com.crypto.exception.MyServiceException;
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.service.UserService;
 import com.crypto.util.CoinGekoClient;
 import com.crypto.wallet.dto.Currency;

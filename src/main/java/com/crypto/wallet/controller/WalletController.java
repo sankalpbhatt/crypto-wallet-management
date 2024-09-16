@@ -44,6 +44,7 @@ public class WalletController {
     }
 
     @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteWallet(@PathVariable("id") String id) {
         walletService.deleteWallet(id);
     }

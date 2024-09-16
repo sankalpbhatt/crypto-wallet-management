@@ -2,7 +2,7 @@ package com.crypto.transaction.controller;
 
 import com.crypto.transaction.dto.request.CreateTransactionRequest;
 import com.crypto.transaction.entity.TransactionType;
-import com.crypto.user.dto.CreateUserRequest;
+import com.crypto.user.dto.request.CreateUserRequest;
 import com.crypto.wallet.dto.Currency;
 import com.crypto.wallet.dto.request.CreateWalletRequest;
 import com.crypto.wallet.dto.request.UpdateWalletRequest;

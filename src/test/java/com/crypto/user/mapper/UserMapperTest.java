@@ -1,7 +1,7 @@
 package com.crypto.user.mapper;
 
-import com.crypto.user.dto.CreateUserRequest;
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.request.CreateUserRequest;
+import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.entity.User;
 import com.crypto.user.utils.HashUtils;
 import org.junit.jupiter.api.BeforeEach;

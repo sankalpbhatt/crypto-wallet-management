@@ -1,6 +1,6 @@
 package com.crypto.user.controller;
 
-import com.crypto.user.dto.UserResponse;
+import com.crypto.user.dto.response.UserResponse;
 import com.crypto.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

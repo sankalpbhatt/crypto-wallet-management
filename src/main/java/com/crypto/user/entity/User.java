@@ -25,7 +25,8 @@ public class User {
     private LocalDateTime createdDate = LocalDateTime.now();
     private LocalDateTime updatedDate;
     private LocalDateTime deletedDate;
-    public User(){
+
+    public User() {
         // Do Nothing
     }
 
@@ -104,5 +105,13 @@ public class User {
 
     public void setUpdatedDate(LocalDateTime updatedDate) {
         this.updatedDate = updatedDate;
+    }
+
+    public LocalDateTime getDeletedDate() {
+        return deletedDate;
+    }
+
+    public void setDeletedDate(LocalDateTime deletedDate) {
+        this.deletedDate = deletedDate;
     }
 }
