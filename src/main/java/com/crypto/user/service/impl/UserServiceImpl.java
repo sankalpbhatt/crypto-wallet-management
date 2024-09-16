@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
@@ -63,7 +62,7 @@ public class UserServiceImpl extends SequenceGeneratorServiceImpl implements Use
     @Transactional(readOnly = true)
     public UserResponse getUser(String id) {
         User user = userRepository.findByUserId(id)
-                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+                .orElseThrow(() -> new MyServiceException(ERROR_MESSAGE_USER_NOT_FOUND, ErrorCode.BUSINESS_ERROR));
         return userMapper.mapToResponseDto(user);
     }
 
@@ -71,22 +70,23 @@ public class UserServiceImpl extends SequenceGeneratorServiceImpl implements Use
     @Transactional(readOnly = true)
     public UserResponse getUserByInternalId(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+                .orElseThrow(() -> new MyServiceException(ERROR_MESSAGE_USER_NOT_FOUND, ErrorCode.BUSINESS_ERROR));
         return userMapper.mapToResponseDto(user);
     }
 
     @Override
     public void deleteUserById(String id) {
         User user = userRepository.findByUserId(id)
-                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+                .orElseThrow(() -> new MyServiceException(ERROR_MESSAGE_USER_NOT_FOUND, ErrorCode.BUSINESS_ERROR));
         user.setDeletedDate(LocalDateTime.now());
+        user.setUpdatedDate(LocalDateTime.now());
         userRepository.save(user);
     }
 
     @Override
     public UserResponse updateUser(String id, UpdateUserRequest updateUserRequest) {
         User user = userRepository.findByUserId(id)
-                .orElseThrow(() -> new NoSuchElementException(ERROR_MESSAGE_USER_NOT_FOUND));
+                .orElseThrow(() -> new MyServiceException(ERROR_MESSAGE_USER_NOT_FOUND, ErrorCode.BUSINESS_ERROR));
         user.setUpdatedDate(LocalDateTime.now());
         if (Objects.nonNull(updateUserRequest.getFirstName())) {
             user.setFirstName(updateUserRequest.getFirstName());

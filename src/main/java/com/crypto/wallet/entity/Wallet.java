@@ -1,6 +1,5 @@
 package com.crypto.wallet.entity;
 
-import com.crypto.wallet.dto.Currency;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -8,8 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "wallets", schema = "crypto")
+@SQLRestriction("deleted_at <> null")
 public class Wallet {
 
     @Id

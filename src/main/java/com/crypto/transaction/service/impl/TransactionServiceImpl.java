@@ -73,7 +73,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
                 finalTransaction.setStatus(TransactionStatus.CONFIRMED);
                 finalTransaction.setUpdatedAt(LocalDateTime.now());
                 transactionRepository.save(finalTransaction);
-                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction);
+                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction, null);
                 transactionResponse.setWalletId(walletResponse.getId());
                 return transactionResponse;
             } catch (InterruptedException e) {
@@ -81,7 +81,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
                 finalTransaction.setStatus(TransactionStatus.FAILED);
                 finalTransaction.setUpdatedAt(LocalDateTime.now());
                 transactionRepository.save(finalTransaction);
-                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction);
+                TransactionResponse transactionResponse = transactionMapper.mapToResponseDto(finalTransaction, null);
                 transactionResponse.setWalletId(walletResponse.getId());
                 return transactionResponse;
             }
@@ -126,6 +126,7 @@ public class TransactionServiceImpl extends SequenceGeneratorServiceImpl impleme
     public TransactionResponse getTransactionById(String id) {
         Transaction transaction = transactionRepository.findByTransactionId(id)
                 .orElseThrow(() -> new NoSuchElementException("Wallet not found"));
-        return transactionMapper.mapToResponseDto(transaction);
+        WalletResponse walletResponse = walletService.getWalletById(transaction.getWalletId());
+        return transactionMapper.mapToResponseDto(transaction, walletResponse.getId());
     }
 }

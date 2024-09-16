@@ -30,7 +30,7 @@ public class TransactionController {
         return transactionService.createTransaction(createTransactionRequest);
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public TransactionResponse getTransactionById(@PathVariable("id") String id) {
         return transactionService.getTransactionById(id);
     }

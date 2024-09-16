@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements WalletService {
@@ -104,6 +105,13 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         return walletResponse;
     }
 
+    @Override
+    public WalletResponse getWalletById(UUID id) {
+        Wallet wallet = walletRepository.findById(id)
+                .orElseThrow(() -> new MyServiceException("Wallet not found", ErrorCode.BUSINESS_ERROR));
+        return walletMapper.mapToResponseDto(wallet, null);
+    }
+
     @Transactional
     @Override
     public WalletResponse updateWallet(String id, UpdateWalletRequest updateWalletRequest) {
@@ -159,6 +167,7 @@ public class WalletServiceImpl extends SequenceGeneratorServiceImpl implements W
         Wallet wallet = walletRepository.findByWalletId(id)
                 .orElseThrow(() -> new MyServiceException("Wallet not found", ErrorCode.BUSINESS_ERROR));
         wallet.setDeletedAt(LocalDateTime.now());
+        wallet.setUpdatedAt(LocalDateTime.now());
         walletRepository.save(wallet);
     }
 

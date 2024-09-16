@@ -16,7 +16,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -153,8 +152,8 @@ class UserServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> userService.getUser(userId))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("User Not found");
+                .isInstanceOf(MyServiceException.class)
+                .hasMessage("Business Error : User Not found");
 
         verify(userRepository).findByUserId(userId);
     }
@@ -197,9 +196,39 @@ class UserServiceImplTest {
 
         // Act & Assert
         assertThatThrownBy(() -> userService.getUserByInternalId(internalId))
-                .isInstanceOf(NoSuchElementException.class)
-                .hasMessage("User Not found");
+                .isInstanceOf(MyServiceException.class)
+                .hasMessage("Business Error : User Not found");
 
         verify(userRepository).findById(internalId);
+    }
+
+    @Test
+    void shouldDeleteUserById() {
+        // Arrange
+        UUID internalId = UUID.randomUUID();
+        User user = new User();
+        user.setId(internalId);
+        user.setUserId("U001");
+        user.setEmail("test@example.com");
+        when(userRepository.findByUserId(anyString())).thenReturn(Optional.of(user));
+
+        // Act
+        userService.deleteUserById("U001");
+
+        // Assert
+        ArgumentCaptor<User> userArgumentCaptor = ArgumentCaptor.captor();
+        verify(userRepository).save(userArgumentCaptor.capture());
+        assertThat(userArgumentCaptor.getValue().getDeletedDate()).isNotNull();
+    }
+
+    @Test
+    void shouldThrowErrorWhenUserNotFoundWhileDeletingUserById() {
+        // Arrange
+        when(userRepository.findByUserId(anyString())).thenReturn(Optional.empty());
+
+        // Act and Assert
+        assertThatThrownBy(() -> userService.deleteUserById("U001"))
+                .isInstanceOf(MyServiceException.class)
+                .hasMessage("Business Error : User Not found");
     }
 }

@@ -12,8 +12,9 @@ import java.util.UUID;
 @Component
 public class TransactionMapper {
 
-    public TransactionResponse mapToResponseDto(Transaction transaction) {
+    public TransactionResponse mapToResponseDto(Transaction transaction, String walletId) {
         TransactionResponse transactionResponse = new TransactionResponse(transaction.getTransactionId(),
+                walletId,
                 transaction.getAmount(),
                 transaction.getType(),
                 transaction.getStatus(),
