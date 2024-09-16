@@ -2,7 +2,6 @@ package com.crypto.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.crypto.exception.MyServiceException;
 import com.crypto.exception.model.ErrorCode;
 import jakarta.servlet.FilterChain;
@@ -73,10 +72,8 @@ public class SecurityFilter extends OncePerRequestFilter {
 
         Algorithm algorithm = Algorithm.RSA256((RSAPublicKey) publicKey, null);
 
-        DecodedJWT decodedJWT = JWT.require(algorithm)
+        JWT.require(algorithm)
                 .build()
                 .verify(jwtToken);
-        System.out.println("Decoded JWT:");
-        System.out.println("Client ID: " + decodedJWT.getClaim("clientId").asString());
     }
 }
